@@ -1,0 +1,23 @@
+from app import db
+
+class Usuario(db.Model):
+    id= db.Column(db.Integrer, primary_key=True)
+    usuario = db.Column(db.String(250), nullable=False)
+    contrasena = db.Column(db.String(250), nullable=False)
+
+class DirectorioInterno (db.Model):
+    id = db.Column(db.Integer, primar_key = True)
+    nombre = db.Column(db.String(250))
+    cargo = db.Column(db.String(250))
+
+class Captura(db.Model):
+    folio_acaac = db.Column (db.Integer, primary_key=True, autoincrement=True)
+    fecha_elaboracion = db.Column(db.Date, nullable=False)
+    fecha_recepcion = db.Column(db.Date, nullable = False)
+    numero_oficio = db.Column(db.String(250), nullable = False)
+    asunto = db.Column(db.String(300))
+    remitente = db.Column(db.String(100), db.ForeignKey('directorio_interno.nombre'))
+    destinatario = db.Column(db.String(200))
+    prioridad = db.Column(db.String(100))
+    observacion = db.Column(db.String(100))
+    atendio =  db.Column(db.String(50))
