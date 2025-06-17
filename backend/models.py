@@ -21,3 +21,11 @@ class Captura(db.Model):
     prioridad = db.Column(db.String(100))
     observacion = db.Column(db.String(100))
     atendio =  db.Column(db.String(50))
+
+class DirectorioExterno(db.Model):
+    __tablename__ = 'directorio_externo'
+
+    id = db.Columns(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(250), nullable = False)
+    cargo = db.Column(db.String(250))
+    institucion = db.Column(db.String(250))
