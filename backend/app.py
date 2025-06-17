@@ -8,7 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 CORS (app) #permite peticiones desde react
 
-app.config['SQLALCEHMY_DATABASE_URI'] = 'mysql+pymysql://root:Karen1312@localhost/archivo'
+app.config['SQLALCEHMY_DATABASE_URI'] = "mysql+pymysql://root:Karen1312@hopper.proxy.rlwy.net:28776/railway"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy (app)
