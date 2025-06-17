@@ -1,7 +1,8 @@
 from flask import Blueprint, request, jsonify
-from app import db, DirectorioExterno
+from extensions import db
 from models import Captura
 from datetime import datetime
+
 
 captura_bp = Blueprint('captura_bp', __name__)
 
@@ -33,7 +34,7 @@ def crear_captura():
             fecha_elaboracion=datetime.strptime(data['fecha_elaboracion'], '%d-%m-%Y'),
             fecha_recepcion=datetime.strptime(data['fecha_recepcion'], '%d-%m-%Y'),
             numero_oficio=data['numero_oficio'],
-            asunto=data.get('aunto'),
+            asunto=data.get('asunto'),
             remitente=data.get('remitente'),
             destinatario=data.get('destinatario'),
             prioridad=data.get('prioridad'),
@@ -45,32 +46,3 @@ def crear_captura():
         return jsonify({'message': 'Captura Guardada Correctamente', 'Folio Acaac': captura.folio_acaac}), 201
     except Exception as e:
         return jsonify ({'Error': str(e)}), 400
-
-
-directorio_ext_bp = Blueprint('directorio_ext_bp', __name__)
-
-@directorio_ext_bp.route('/api/directorio-externo', methods=['GET'])
-def obetener_directorio_externo():
-    registros = DirectorioExterno.query.all()
-    resultado = [
-        {
-            "id": r.id,
-            "nombre": r.nombre,
-            "cargo": r.cargo,
-            "institucion": r.institucion
-        }
-        for r in registros
-    ]
-    return jsonify(resultado)
-
-@directorio_ext_bp.route('/api/directorio-externo', methods=['POST'])
-def agregar_contacto_externo():
-    data = request.json
-    nuevo_contacto = DirectorioExterno(
-        nombre=data.get("nombre"),
-        cargo=data.get("cargo"),
-        institucion=data.get("institucion")
-    )
-    db.session.add(nuevo_contacto)
-    db.session.commit()
-    return jsonify({"mensaje": "Contacto Agregado"}), 201
