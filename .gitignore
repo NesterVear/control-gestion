@@ -1,10 +1,9 @@
 # Entornos virtuales  
-venv/  
-.env/  
-__pycache__/  
+**/venv/  
+**/.env  
+**/__pycache__/  
 *.pyc  
 *.log  
 *.db  
 .vscode/  
-.idea/ 
-backend/.env
+.idea/
