@@ -1,0 +1,25 @@
+[project]
+name = "control de gestion"
+version = "1.0.0"
+description = "un control de gestion totalmente funcional para la captura y gestion de los diferentes oficios asi como la automatizacion de las tareas"
+authors = [
+  { name="Nester Vear 🐻", email="diego24tinajero@gmail.com" }
+]
+license = "CC BY-NC-SA 4.0"
+readme = "README.md"
+requires-python = ">=3.9"
+
+dependencies = [
+  "Flask",
+  "Flask-Cors",
+  "Flask-SQLAlchemy",
+  "python-dotenv",
+  "PyMySQL"
+]
+
+[tool.setuptools]
+package-dir = {"" = "backend"}
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"

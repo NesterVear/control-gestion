@@ -1,0 +1,24 @@
+Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+
+Copyright (c) 2025 Nester Vear
+
+Este proyecto está licenciado bajo los términos de la Licencia Creative Commons 
+Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0).
+
+Puedes compartir, copiar, distribuir y adaptar este código con las siguientes condiciones:
+
+1. Atribución (BY): Debes dar el crédito adecuado, proporcionar un enlace a la licencia 
+   e indicar si se hicieron cambios. Puedes hacerlo de cualquier forma razonable, pero 
+   no de manera que sugiera que tienes el respaldo del autor original.
+
+2. No Comercial (NC): No puedes utilizar este código con fines comerciales.
+
+3. Compartir Igual (SA): Si modificas o transformas el código, o generas contenido derivado, 
+   debes distribuir tu contribución bajo esta misma licencia.
+
+Este software se proporciona "tal cual", sin garantías de ningún tipo.
+
+Más información:
+https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+Autor: Nester Vear
