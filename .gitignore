@@ -1,9 +1,15 @@
-# Entornos virtuales  
-**/venv/  
-**/.env  
-**/__pycache__/  
-*.pyc  
-*.log  
-*.db  
-.vscode/  
+# Entornos virtuales
+**venv/
+**/.env
+__pycache__/
+*.pyc
+*.log
+*.db
+.vscode/
 .idea/
+.dotfiles/
+# Otros archivos sensibles potenciales
+secrets.txt
+config/secrets.txt
+*.key
+*.pem
