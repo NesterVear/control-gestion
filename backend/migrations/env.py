@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
@@ -27,7 +27,6 @@ fileConfig(config.config_file_name)
 
 # metadata de los modelos
 target_metadata = Base.metadata
-
 
 def run_migrations_offline():
     """Ejecuta migraciones en modo offline."""
@@ -64,3 +63,7 @@ if context.is_offline_mode():
     run_migrations_offline()
 else:
     run_migrations_online()
+
+
+# Creado por: Nester Vear 🐻
+# GitHub: github.com/NesterVear

@@ -6,3 +6,7 @@ db = SQLAlchemy()
 cors = CORS()
 mail = Mail()
 
+
+
+# Creado por: Nester Vear 🐻
+# GitHub: github.com/NesterVear

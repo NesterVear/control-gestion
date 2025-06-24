@@ -46,6 +46,5 @@ class DirectorioExterno(Base):
     institucion = db.Column(db.String(250))
 
 
-
 # Creado por: Nester Vear 🐻
 # GitHub: github.com/NesterVear
