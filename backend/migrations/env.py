@@ -1,10 +1,9 @@
+import sys
+import os
 from logging.config import fileConfig
-
 from sqlalchemy import engine_from_config, pool
 from alembic import context
 from dotenv import load_dotenv
-import os
-import sys
 
 # Anade el directorio raiz del proyecto al PYTHONPATH
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -20,6 +19,7 @@ from models import Base
 config = context.config
 
 # configura la URL de la base de datos desde .env
+# database_url = os.getenv('DATABASE_URL', 'sqlite:///./test.db')
 config.set_main_option('sqlalchemy.url', os.getenv('DATABASE_URL'))
 
 # Configura el login
@@ -30,9 +30,7 @@ target_metadata = Base.metadata
 
 
 def run_migrations_offline():
-    """
-    ejecuta migraciones en modo offline.    
-    """
+    """Ejecuta migraciones en modo offline."""
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
@@ -46,9 +44,7 @@ def run_migrations_offline():
 
 
 def run_migrations_online():
-    """
-    Ejecuta migraciones modo online.
-    """
+    """Ejecuta migraciones modo online."""
     connectable = engine_from_config(
         config.get_section(config.config_ini_section),
         prefix="sqlalchemy.",
@@ -57,12 +53,12 @@ def run_migrations_online():
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata,
+            connection=connection, 
+            target_metadata=target_metadata,
         )
 
         with context.begin_transaction():
             context.run_migrations()
-
 
 if context.is_offline_mode():
     run_migrations_offline()

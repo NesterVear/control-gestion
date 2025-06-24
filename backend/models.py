@@ -30,10 +30,22 @@ class Captura(Base):
     observacion = db.Column(db.String(100))
     atendio =  db.Column(db.String(50))
     pdf_url = db.Column(db.String(200), nullable=True)
+    eliminado = db.Column(db.Boolean, default=False)
+    eliminado_por = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=True)
+    tipo = db.Column(db.String(50), nullable=False) #Entrada o Salida
+    status = db.Column(db.String(50), nullable=True) #Conocimiento o Respuesta (solo para Entrada)
+    respuesta_pdf_url = db.Column(db.String(200), nullable=True) #PDF de respuesta (solo para Entrada)
+    completado = db.Column(db.Boolean, default=False) #Marcado al subir respuesta o para Conocimiento/Salida con PDF
+    
 
-class DirectorioExterno(db.Model):
+class DirectorioExterno(Base):
     __tablename__ = 'directorio_externo'
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(250), nullable = False)
     cargo = db.Column(db.String(250))
     institucion = db.Column(db.String(250))
+
+
+
+# Creado por: Nester Vear 🐻
+# GitHub: github.com/NesterVear
