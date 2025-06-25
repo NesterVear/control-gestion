@@ -9,6 +9,7 @@ class Usuario(Base):
     usuario = db.Column(db.String(250), nullable=False)
     contrasena = db.Column(db.String(250), nullable=False)
     capturas = db.relationship('Captura', backref='usuario', lazy=True)
+    es_super_usurio = db.Column(db.Boolean, default=False, nullable=False)
 
 class DirectorioInterno (Base):
     __tablename__ = 'directorio_interno'

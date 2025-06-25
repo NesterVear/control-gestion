@@ -29,6 +29,7 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.getenv('SMTP_USER')
 app.config['MAIL_PASSWORD'] = os.getenv('SMTP_PASSWORD')
 
+# Inicializa extensiones
 db.init_app(app)
 migrate = Migrate(app, db)
 Mail = Mail(app)
@@ -58,11 +59,10 @@ scheduler.add_job(verificar_alertas, 'interval', days=1, start_date='2025-06-18 
 scheduler.start()
 
 if __name__=='__main__':
-    with app.app_context():
-        db.create_all()
+    # with app.app_context():
+        # db.create_all()
     port = int (os.getenv('PORT', 5000)) 
     app.run(host='0.0.0.0', port=port, debug=app.config['DEBUG'])
-
 
 
 
