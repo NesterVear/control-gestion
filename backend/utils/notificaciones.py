@@ -35,7 +35,7 @@ def enviar_correo(app, app_config, captura, recipient):
     mail = Mail(app)
     msg = Message(
         subject=f'Alerta: Captura {captura.folio_acaac}, {captura.numero_oficio} pendiente',
-        sender=app_config['SMTP_USER'],
+        sender=app_config['MAIL_USERNAME'],
         recipients=[recipient],
         body=f'Captura {captura.folio_acaac} con numero de oficio {captura.numero_oficio}, ({captura.tipo}) marcado como {captura.prioridad}, se encuentra pendiente desde {captura.fecha_recepcion.strftime("%d-%m-%Y")} y no ha sido atendido, por favor atender de INMEDIATO.'
     )
