@@ -2,7 +2,25 @@
   "name": "Flask App",
   "image": "mcr.microsoft.com/devcontainers/python:3.11",
 
-  "postCreateCommand": "echo '{\"python.defaultInterpreterPath\": \"${workspaceFolder}/backend/venv/bin/python\", \"python.terminal.activateEnvironment\": true}' > .vscode/settings.json && if [ \"$CODESPACES\" = \"true\" ]; then python -m venv backend/venv && backend/venv/bin/pip install --upgrade pip && backend/venv/bin/pip install -r backend/requirements.txt; fi",
+  // ①   crea/actualiza ajustes de VS Code SIEMPRE
+  // ②   SOLO en Codespaces (cuando $CODESPACE_NAME esté definido):
+  //      - genera el venv si falta
+  //      - instala requisitos
+  "postCreateCommand": "bash -c '\
+    mkdir -p .vscode && \
+    echo \"{\\\"python.defaultInterpreterPath\\\": \\\"${workspaceFolder}/backend/venv/bin/python\\\", \\\"python.terminal.activateEnvironment\\\": true, \\\"terminal.integrated.env.linux\\\": {\\\"VIRTUAL_ENV\\\": \\\"${workspaceFolder}/backend/venv\\\", \\\"PATH\\\": \\\"${workspaceFolder}/backend/venv/bin:${env:PATH}\\\"}}\" > .vscode/settings.json && \
+    if [ -n \"$CODESPACE_NAME\" ]; then \
+        if [ ! -d backend/venv ]; then \
+            echo \"[Codespaces] Creando venv e instalando dependencias…\"; \
+            python -m venv backend/venv && \
+            backend/venv/bin/pip install --upgrade pip && \
+            backend/venv/bin/pip install -r backend/requirements.txt ; \
+        else \
+            echo \"[Codespaces] venv ya existe, nada que hacer.\"; \
+        fi \
+    else \
+        echo \"[Local] Omitiendo creación de venv.\"; \
+    fi'",
 
   "customizations": {
     "vscode": {
