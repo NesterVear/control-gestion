@@ -1,0 +1,12 @@
+{
+  "name": "Flask App",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+
+  "postCreateCommand": "echo '{\"python.defaultInterpreterPath\": \"${workspaceFolder}/backend/venv/bin/python\", \"python.terminal.activateEnvironment\": true}' > .vscode/settings.json && if [ \"$CODESPACES\" = \"true\" ]; then python -m venv backend/venv && backend/venv/bin/pip install --upgrade pip && backend/venv/bin/pip install -r backend/requirements.txt; fi",
+
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python"]
+    }
+  }
+}

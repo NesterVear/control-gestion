@@ -14,4 +14,3 @@ secrets.txt
 config/secrets.txt
 *.key
 *.pem
-.devcontainer/
