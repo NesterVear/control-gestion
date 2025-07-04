@@ -1,148 +1,116 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify, request
 from extensions import db
-from models import Captura, Usuario
+from models import Captura
 from datetime import datetime
+from utils.notificaciones import verificar_alertas
 
-captura_bp = Blueprint('captura_bp', __name__)
+captura_bp = Blueprint('captura', __name__)
 
-VALID_ATENDIO = ['Mitzi', 'Rosy', 'Edgar', 'Chiqui']
-VALID_PRIORIDAD = ['Extraurgente', 'Urgente', 'Ordinario']
-VALID_TIPO = ['Entrada', 'Salida']
+def require_role(role):
+    def decorator(f):
+        def wrapped_function(*args, **kwargs):
+            user_id = request.headers.get('User-ID')
+            if not user_id:
+                return jsonify({'error': 'Usuario no autenticado'}), 401
+            usuario = db.session.get(Usuario, user_id)
+            if not usuario or usuario.rol not in role:
+                return jsonify({'error': 'Acceso denegado'}), 403
+            return f(*args, **kwargs)
+        return wrapped_function
+    return decorator
 
 @captura_bp.route('/', methods=['GET'])
-def listar_capturas():
- capturas = Captura.query.filter_by(eliminado=False).all()
- resultados = []
- for c in capturas:
-     resultados.append({
-         'folio_acaac': c.folio_acaac,
-         'usuario_id': c.usuario_id,
-         'fecha_elaboracion': c.fecha_elaboracion.strftime('%d-%m-%Y'),
-         'fecha_recepcion': c.fecha_recepcion.strftime('%d-%m-%Y'),
-         'numero_oficio': c.numero_oficio,
-         'asunto': c.asunto,
-         'remitente': c.remitente,
-         'destinatario': c.destinatario,
-         'prioridad': c.prioridad,
-         'observacion': c.observacion,
-         'atendio': c.atendio,
-         'pdf_url': c.pdf_url,
-         'eliminado': c.eliminado,
-         'tipo': c.tipo,
-         'status': c.status,
-         'respuesta_pdf_url': c.respuesta_pdf_url,
-         'completado': c.completado
-     })
- return jsonify(resultados)
+@require_role(['Administrador', 'Lector', 'SuperRoot'])
+def get_capturas():
+   capturas = Captura.query.filter_by(eliminado=False).all()
+   return jsonify([{
+        'folio_acaac': c.folio_acaac,
+        'usuario_id': c.usuario_id,
+        'fecha_elaboracion': c.fecha_elaboracion.strftime('%d-%m-%Y'),
+        'fecha_recepcion': c.fecha_recepcion.strftime('%d-%m-%Y'),
+        'numero_oficio': c.numero_oficio,
+        'asunto': c.asunto,
+        'remitente': c.remitente,
+        'destinatario': c.destinatario,
+        'prioridad': c.prioridad,
+        'observacion': c.observacion,
+        'atendio': c.atendio,
+        'pdf_url': c.pdf_url,
+        'eliminado': c.eliminado,
+        'tipo': c.tipo,
+        'status': c.status,
+        'respuesta_pdf_url': c.respuesta_pdf_url,
+        'completado': c.completado
+   } for c in capturas]) 
 
 @captura_bp.route('/', methods=['POST'])
+@require_role(['Administrador', 'SuperRoot'])
 def crear_captura():
- data = request.json
- try:
-     atendio = data.get('atendio')
-     if atendio not in VALID_ATENDIO:
-         return jsonify({'Error': f"El campo atendio debe ser uno de: {', '.join(VALID_ATENDIO)}"}), 400
-     prioridad = data.get('prioridad')
-     if prioridad not in VALID_PRIORIDAD:
-         return jsonify({'Error': f"La prioridad debe ser uno de: {', '.join(VALID_PRIORIDAD)}"}), 400
-     tipo = data.get('tipo')
-     if tipo not in VALID_TIPO:
-         return jsonify({'Error': f"El campo tipo debe ser uno de: {', '.join(VALID_TIPO)}"}), 400
-     # Determinar estado completado según tipo
-     completado = False
-     if tipo == 'Entrada':
-         completado = bool(data.get('respuesta_pdf_url'))
-     elif tipo == 'Salida':
-         completado = bool(data.get('pdf_url'))
-     captura = Captura(
-         usuario_id=data.get('usuario_id', 1),
-         fecha_elaboracion=datetime.strptime(data['fecha_elaboracion'], '%d-%m-%Y').date(),
-         fecha_recepcion=datetime.strptime(data['fecha_recepcion'], '%d-%m-%Y').date(),
-         numero_oficio=data['numero_oficio'],
-         asunto=data.get('asunto'),
-         remitente=data.get('remitente'),
-         destinatario=data.get('destinatario'),
-         prioridad=prioridad,
-         observacion=data.get('observacion'),
-         atendio=atendio,
-         pdf_url=data.get('pdf_url'),
-         eliminado=False,
-         tipo=tipo,
-         status=data.get('status'),
-         respuesta_pdf_url=data.get('respuesta_pdf_url'),
-         completado=completado
-     )
-     db.session.add(captura)
-     db.session.commit()
-     return jsonify({'message': 'Captura Guardada Correctamente', 'Folio Acaac': captura.folio_acaac}), 201
- except Exception as e:
-     db.session.rollback()
-     return jsonify({'Error': str(e)}), 400
+    data = request.get_json()
+    try:
+       fecha_elaboracion = datetime.strptime(data['fecha_elaboracion'], '%d-%m-%Y').date()
+       fecha_recepcion = datetime.strptime(data['fecha_recepcio'], '%d-%m-%Y').date() 
+    except ValueError:
+        return jsonify({'error': 'Formato de fecha invalido tonoto'}), 400
+    nueva_captura = Captura(
+       usuario_id =data['usuario_id'],
+       fecha_elaboracion=fecha_elaboracion,
+       fecha_recepcion=fecha_recepcion,
+       numero_oficio=data['numero_oficio'],
+       asunto=data.get('asunto'),
+       remitente=data.get('remitente'),
+       destinatario=data.get('destinatario'),
+       prioridad=data['prioridad'],
+       observacion=data.get('observacion'),
+       atendio=data.get('atendio'),
+       pdf_url=data.get('pdf_url'),
+       tipo=data['tipo'],
+       status=data.get('status'),
+       respuesta_pdf_url=data.get('respuesta_pdf_url'),
+       completado=data.get('completado', False)
+    )
+    db.session.add(nueva_captura)
+    db.session.commit()
+    return jsonify({'message': 'Captura Guardada Correctamente', 'Folio Acaac': nueva_captura.folio_acaac}), 201
 
 @captura_bp.route('/<int:folio_acaac>', methods=['PUT'])
+@require_role(['Administrador', 'Lector', 'SuperRoot'])
 def actualizar_captura(folio_acaac):
- captura = Captura.query.get_or_404(folio_acaac)
- data = request.json
- try:
-     atendio = data.get('atendio', captura.atendio)
-     if atendio not in VALID_ATENDIO:
-         return jsonify({'Error': f"El campo atendio debe ser uno de: {', '.join(VALID_ATENDIO)}"}), 400
-     prioridad = data.get('prioridad', captura.prioridad)
-     if prioridad not in VALID_PRIORIDAD:
-         return jsonify({'Error': f"La prioridad debe ser uno de: {', '.join(VALID_PRIORIDAD)}"}), 400
-     tipo = data.get('tipo', captura.tipo)
-     if tipo not in VALID_TIPO:
-         return jsonify({'error': f"El campo tipo debe ser uno de: {', '.join(VALID_TIPO)}"}), 400
-     # Actualizar estado completado
-     if tipo == 'Entrada':
-         captura.completado = bool(data.get('respuesta_pdf_url', captura.respuesta_pdf_url))
-     elif tipo == 'Salida':
-         captura.completado = bool(data.get('pdf_url', captura.pdf_url))
-     captura.usuario_id = data.get('usuario_id', captura.usuario_id)
-     captura.fecha_elaboracion = datetime.strptime(data['fecha_elaboracion'], '%d-%m-%Y').date() if data.get('fecha_elaboracion') else captura.fecha_elaboracion
-     captura.fecha_recepcion = datetime.strptime(data.get('fecha_recepcion'), '%d-%m-%Y').date() if data.get('fecha_recepcion') else captura.fecha_recepcion
-     captura.numero_oficio = data.get('numero_oficio', captura.numero_oficio)
-     captura.asunto = data.get('asunto', captura.asunto)
-     captura.remitente = data.get('remitente', captura.remitente)
-     captura.destinatario = data.get('destinatario', captura.destinatario)
-     captura.prioridad = prioridad
-     captura.observacion = data.get('observacion', captura.observacion)
-     captura.atendio = atendio
-     captura.pdf_url = data.get('pdf_url', captura.pdf_url)
-     captura.tipo = tipo
-     captura.status = data.get('status', captura.status)
-     captura.respuesta_pdf_url = data.get('respuesta_pdf_url', captura.respuesta_pdf_url)
-     db.session.commit()
-     return jsonify({'message': 'Captura Actualizada Correctamente'})
- except Exception as e:
-     db.session.rollback()
-     return jsonify({'error': str(e)}), 400
+   captura = Captura.query.get_or_404(folio_acaac)
+   data = request.get_json()
+   if captura.eliminado:
+      return jsonify ({'error': 'Captura eliminada'}), 400
+   for key, value in data.items():
+      if key in ['fecha_elaboracion', 'fecha_recepcion']:
+        try:
+           value = datetime.strptime(value, '%d-%m-%Y').date()
+        except ValueError:
+           return jsonify({'error': 'Formato de fecha invalido'}), 400
+        setattr(captura, key, value)
+        if captura.tipo == 'Entrada' and captura.respuesta_pdf_url:
+            captura.completado = True
+        elif captura.tipo == 'Salida' and captura.pdf_url:
+            captura.completado = True
+        db.session.commit()
+        return jsonify({'mensaje': 'Captura actualizada'})
 
+    
 @captura_bp.route('/<int:folio_acaac>', methods=['DELETE'])
+@require_role(['SuperRoot'])
 def eliminar_captura(folio_acaac):
- captura = Captura.query.get_or_404(folio_acaac)
- data = request.json
- try:
-     eliminado_por = data.get('eliminado_por')
-     if not eliminado_por:
-         return jsonify({'error': 'Se requiere eliminado_por'}), 400
-     usuario = Usuario.query.filter_by(usuario=eliminado_por, es_super_usuario=True).first()
-     if not usuario:
-         return jsonify({'error': 'Solo un super usuario puede eliminar capturas'}), 403
-     captura.eliminado = True
-     captura.eliminado_por = usuario.id
-     db.session.commit()
-     return jsonify({'message': 'Captura Marcada como Eliminada Correctamente'})
- except Exception as e:
-     db.session.rollback()
-     return jsonify({'error': str(e)}), 400
+   captura = Captura.query.get_or_404(folio_acaac)
+   captura.eliminado = True
+   captura.eliminado_por = request.headers.get('User-ID')
+   db.session.commit()
+   return jsonify({'mensaje': 'Captura eliminada'})
 
 @captura_bp.route('/test-alertas', methods=['GET'])
+@require_role(['SuperRoot'])
 def test_alertas():
- from utils.notificaciones import verificar_alertas
- from app import app
- verificar_alertas(app, app.config)
- return jsonify({'mensaje': 'Alertas verificadas correctamente'})
+   from utils.notificaciones import verificar_alertas
+   from app import app
+   verificar_alertas(app, app.config)
+   return jsonify({'mensaje': 'Alertas verificadas correctamente te ganaste un beso de Arisdelsi'})
 
 # Creado por: Nester Vear 🐻
 # GitHub: github.com/NesterVear

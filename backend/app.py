@@ -2,6 +2,8 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from extensions import db, mail
 from routes.captura_routes import captura_bp
+from routes.usuario_routes import usuario_bp
+from routes.directorio_externo_routes import directorio_externo_bp
 from apscheduler.schedulers.background import BackgroundScheduler
 from utils.notificaciones import init_scheduler
 import os
@@ -10,12 +12,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, resources={r"/captura/*": {"origins": os.getenv('ALLOWED_ORIGINS', '').split(',')}})
+CORS(app, resources={r"/*": {"origins": os.getenv('ALLOWED_ORIGINS', '').split(',')}})
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'default-secret-key')
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
 app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
 app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
@@ -35,6 +37,7 @@ mail.init_app(app)
 
 # Registrar blueprint
 app.register_blueprint(captura_bp, url_prefix='/captura')
+app.register_blueprint(usuario_bp, url_prefix='/usuario')
 app.url_map.strict_slashes = False
 
 with app.app_context():
@@ -49,7 +52,7 @@ def test_email():
     msg = Message (
         subject= 'prueba de correo',
         recipients=[app.config['MITZI_EMAIL']],
-        body='Este es un correo del futuro solo para prueba, maniana te detonaran.'
+        body='Este es un correo del futuro solo para prueba, te ves toda hermosa hoy.'
     )
     try:
         mail.send(msg)
