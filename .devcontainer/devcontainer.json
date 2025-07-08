@@ -1,27 +1,38 @@
 {
-  "name": "Flask App",
+  "name": "Flask + Next.js App",
   "image": "mcr.microsoft.com/devcontainers/python:0-3.11",
 
-  // ① Ejecuta el script que crea (si falta) y activa el venv
+  
   "postCreateCommand": "bash .devcontainer/post-create.sh",
+
+  
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    }
+  },
 
   "customizations": {
     "vscode": {
-      "extensions": ["ms-python.python"],
-      // ② Ajustes de VS Code que se aplican a Codespaces y local
+      "extensions": [
+        "ms-python.python",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "ms-azuretools.vscode-docker",
+        "ms-vscode.vscode-typescript-next"
+      ],
       "settings": {
-        // Ruta del intérprete
         "python.defaultInterpreterPath": "${workspaceFolder}/backend/venv/bin/python",
-        // Activa el venv siempre que abras una terminal
         "python.terminal.activateEnvironment": true,
         "terminal.integrated.env.linux": {
-          // Variables para que VS Code detecte el entorno aunque no esté activado
           "VIRTUAL_ENV": "${workspaceFolder}/backend/venv",
           "PATH": "${workspaceFolder}/backend/venv/bin:${env:PATH}"
         }
-      }
+      } 
     }
-  }
+  },
+
+  "forwardPorts": [5000, 3000],
+
+  "remoteUser": "vscode"
 }
-
-

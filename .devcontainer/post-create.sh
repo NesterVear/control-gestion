@@ -20,3 +20,8 @@ fi
 
 # 2. Muestra versión de Python para confirmar
 "$VENV_DIR/bin/python" --version
+
+
+# 3. Opcional: activa el entorno virtual para la sesión actual
+# (esto NO activa para la shell del contenedor, solo para este script)
+source "$VENV_DIR/bin/activate"
