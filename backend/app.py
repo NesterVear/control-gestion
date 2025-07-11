@@ -62,6 +62,21 @@ def check_role():
             if method == 'GET'and path == '/captura/':
                 if usuario.rol not in ['Lector', 'Administrador', 'SuperRoot']:
                     return jsonify({'error': 'Acceso denegado'}), 403
+                elif method == 'PUT' and path == '/captura/<int:folio_acaac>':
+                    if usuario.rol not in ['Lector', 'Administrador', 'SuperRoot']:
+                        return jsonify({'error': 'Acceso denegado'}), 403
+                    elif method == 'POST' and path == '/captura/':
+                        if usuario.rol not in ['Administrador', 'SuperRoot']:
+                            return jsonify({'error': 'Acceso denegado'}), 403
+                    elif method == 'DELETE' and path == '/captura/<int:folio_acaac>':
+                        if usuario.rol != 'SuperRoot':
+                            return jsonify({'error': 'Acceso denegado'}), 403
+                    elif endpoint == '/usuarios/usuarios' and method == 'POST':
+                        if usuario.rol != 'SuperRoot':
+                            return jsonify({'error': 'Acceso denegado'}), 403
+                    elif method == 'GET' and path == '/directorio-externo/':
+                        if usuario.rol not in ['Lector', 'Administrador', 'SuperRoot']:
+                            return jsonify({'error': 'Acceso denegado'})
 
 # Inicializa extensiones
 db.init_app(app)
