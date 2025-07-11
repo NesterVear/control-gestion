@@ -1,4 +1,5 @@
-from flask import Flask, jsonify
+echo @"
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from extensions import db, mail
 from routes.captura_routes import captura_bp
@@ -6,6 +7,7 @@ from routes.usuario_routes import usuario_bp
 from routes.directorio_externo_routes import directorio_externo_bp
 from apscheduler.schedulers.background import BackgroundScheduler
 from utils.notificaciones import init_scheduler
+from models import Usuario
 import os
 from dotenv import load_dotenv
 
@@ -30,6 +32,36 @@ app.config['MITZI_EMAIL'] = os.getenv('MITZI_EMAIL')
 app.config['ROSY_EMAIL'] = os.getenv('ROSY_EMAIL')
 app.config['EDGAR_EMAIL'] = os.getenv('EDGAR_EMAIL')
 app.config['CHIQUI_EMAIL'] = os.getenv('CHIQUI_EMAIL')
+
+# Middleware para verificar roles
+@app.before_request
+def check_role():
+    role_requirements = {
+        '/captura/': ['GET', 'PUT'], #LECTOR, PUEDE HACER GET Y PUT
+        '/captura/<int:folio_acaac>': ['PUT'],
+        '/captura/<int:folio_acaac>': ['POST'], #Administrador y SuperRoot
+        '/captura/<int:folio_acaac>': ['DELETE'], #Solo SuperRoot
+        '/captura/test-alertas': ['GET'], #Solo SuperRoot
+        '/usuarios/usuarios': ['POST'], # Solo SuperRoot
+        '/usuarios/login': ['POST'], #Todos
+        '/directorio-externo/': ['GET', 'POST'], #Administrador y SuperRoot para POST
+        '/directorio-externo/<int:id>': ['PUT', 'DELETE'], #Administrador (PUT), superRoot (PUT, DELETE)
+    }
+    endpoint =request.path
+    method = request.method
+    for path, methods in role_requirements.items():
+        if endpoint.startswith(path.split('<')[0]) and method in methods:
+            user_id = request.headers.get('User-ID')
+            if not user_id:
+                return jsonify({'error': 'Usuario no autenticado'}), 401
+            usuario = db.session.get(Usuario, user_id)
+            if not usuario:
+                return jsonify({'eror': 'Usuario no encontrado'}), 401
+            if endpoint == '/user/login':
+                return #Permitir login sin restricciones
+            if method == 'GET'and path == '/captura/':
+                if usuario.rol not in ['Lector', 'Administrador', 'SuperRoot']:
+                    return jsonify({'error': 'Acceso denegado'}), 403
 
 # Inicializa extensiones
 db.init_app(app)

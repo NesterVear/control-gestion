@@ -15,7 +15,7 @@ export default function Home() {
       body: JSON.stringify({ usuario: 'admin', contrasena: 'admin123' }),
     })
     const data = await res.json()
-    if (data.id) set User({ id: data.id, rol: data.rol })
+    if (data.id) setUser({ id: data.id, rol: data.rol })
       alert(data.mensaje || data.error)
   }
 
@@ -37,7 +37,35 @@ export default function Home() {
       <h1 className="text-3xl font-bold mb-8">Control de Gestión</h1>
       {!user ? ( 
         <Button onClick={login} color="primary">Iniciar Sesión</Button>
-    
-     </main>
-  
+      ) : (
+        <>
+        <CapturaForm userId={user.id} rol={user.rol} />
+        <Table arial-label="Capturas" className="mt-8">
+          <TableHeader>
+            <TableColumn>Folio</TableColumn>
+            <TableColumn>Fecha Elaboración</TableColumn>
+            <TableColumn>Fecha Recepción</TableColumn>
+            <TableColumn>Número Oficio</TableColumn>
+            <TableColumn>Tipo</TableColumn>
+            <TableColumn>Atendió</TableColumn>
+            <TableColumn>Completado</TableColumn>
+           </TableHeader>
+           <TableBody>
+              {capturas.map((captura: any) => (
+                <TableRow key={captura.folio_acaac}>
+                  <TableCell>{captura.folio_acaac}</TableCell>
+                  <TableCell>{captura.fecha_elaboracion}</TableCell>
+                  <TableCell>{captura.fecha_recepcion}</TableCell>
+                  <TableCell>{captura.numero_oficio}</TableCell>
+                  <TableCell>{captura.tipo}</TableCell>
+                  <TableCell>{captura.atendio}</TableCell>
+                  <TableCell>{captura.completado ? 'Si' : 'No'} </TableCell>
+                </TableRow>
+              ))}
+           </TableBody>
+          </Table>
+        </>
+      )}          
+    </main>
+  )
 }
