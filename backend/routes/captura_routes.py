@@ -6,18 +6,26 @@ from utils.notificaciones import verificar_alertas
 
 captura_bp = Blueprint('captura', __name__)
 
-def require_role(role):
-    def decorator(f):
-        def wrapped_function(*args, **kwargs):
-            user_id = request.headers.get('User-ID')
-            if not user_id:
-                return jsonify({'error': 'Usuario no autenticado'}), 401
-            usuario = db.session.get(Usuario, user_id)
-            if not usuario or usuario.rol not in role:
-                return jsonify({'error': 'Acceso denegado'}), 403
-            return f(*args, **kwargs)
-        return wrapped_function
-    return decorator
+@captura_bp.route('/', methods=['GET'], endpoint='get_capturas')
+def get_capturas():
+   capturas = Captura.query.filter_by(eliminado=False).all()
+   return jsonify([{
+      'folio_acaac': c.folio_acaac, 
+      'usuario_id': c.usuario_id,
+      'fecha_elaboracion': c.fecha_elaboracion.strftime ('%d-%m-%Y'),
+      'fecha_recepcion': c.fecha_recepcion.strftime ('%d-%m-%Y'),
+      'numero_oficio': c.numero_oficio,
+      'asunto': c.asunto,
+      'remitente': c.remitente,
+      'destinatario': c.destinatario,
+      'prioridad': c.prioridad,
+      'pdf_url': c.pdf_url,
+      'tipo': c.tipo,
+      'status': c.status,
+      'respuesta_pdf_url': c.respuesta_pdf_url,
+      'completado': c.completado
+   }for c in capturas])
+
 
 @captura_bp.route('/', methods=['GET'])
 @require_role(['Administrador', 'Lector', 'SuperRoot'])
@@ -43,15 +51,16 @@ def get_capturas():
         'completado': c.completado
    } for c in capturas]) 
 
-@captura_bp.route('/', methods=['POST'])
-@require_role(['Administrador', 'SuperRoot'])
+@captura_bp.route('/', methods=['POST'], endpoint='crear_captura')
 def crear_captura():
     data = request.get_json()
     try:
        fecha_elaboracion = datetime.strptime(data['fecha_elaboracion'], '%d-%m-%Y').date()
-       fecha_recepcion = datetime.strptime(data['fecha_recepcio'], '%d-%m-%Y').date() 
+       fecha_recepcion = datetime.strptime(data['fecha_recepcion'], '%d-%m-%Y').date() 
     except ValueError:
         return jsonify({'error': 'Formato de fecha invalido tonoto'}), 400
+    if 'tipo' not in data or data['tipo'] not in ['Entrada', 'Salida']:
+       return jsonify({'error': 'Tipo es obligatorio y debe ser Entrada o Salida'}), 400
     nueva_captura = Captura(
        usuario_id =data['usuario_id'],
        fecha_elaboracion=fecha_elaboracion,
@@ -73,8 +82,7 @@ def crear_captura():
     db.session.commit()
     return jsonify({'message': 'Captura Guardada Correctamente', 'Folio Acaac': nueva_captura.folio_acaac}), 201
 
-@captura_bp.route('/<int:folio_acaac>', methods=['PUT'])
-@require_role(['Administrador', 'Lector', 'SuperRoot'])
+@captura_bp.route('/<int:folio_acaac>', methods=['PUT'], endpoint='actualizar_captura')
 def actualizar_captura(folio_acaac):
    captura = Captura.query.get_or_404(folio_acaac)
    data = request.get_json()
@@ -87,16 +95,15 @@ def actualizar_captura(folio_acaac):
         except ValueError:
            return jsonify({'error': 'Formato de fecha invalido'}), 400
         setattr(captura, key, value)
-        if captura.tipo == 'Entrada' and captura.respuesta_pdf_url:
-            captura.completado = True
-        elif captura.tipo == 'Salida' and captura.pdf_url:
-            captura.completado = True
-        db.session.commit()
-        return jsonify({'mensaje': 'Captura actualizada'})
+      if captura.tipo == 'Entrada' and captura.respuesta_pdf_url:
+         captura.completado = True
+      elif captura.tipo == 'Salida' and captura.pdf_url:
+         captura.completado = True
+      db.session.commit()
+      return jsonify({'mensaje': 'Captura actualizada'})
 
     
-@captura_bp.route('/<int:folio_acaac>', methods=['DELETE'])
-@require_role(['SuperRoot'])
+@captura_bp.route('/<int:folio_acaac>', methods=['DELETE'], endpoint='eliminar_captura')
 def eliminar_captura(folio_acaac):
    captura = Captura.query.get_or_404(folio_acaac)
    captura.eliminado = True
@@ -104,8 +111,7 @@ def eliminar_captura(folio_acaac):
    db.session.commit()
    return jsonify({'mensaje': 'Captura eliminada'})
 
-@captura_bp.route('/test-alertas', methods=['GET'])
-@require_role(['SuperRoot'])
+@captura_bp.route('/test-alertas', methods=['GET'], endpoint='test_alertas')
 def test_alertas():
    from utils.notificaciones import verificar_alertas
    from app import app

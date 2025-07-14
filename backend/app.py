@@ -1,4 +1,3 @@
-echo @"
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from extensions import db, mail
@@ -77,14 +76,23 @@ def check_role():
                     elif method == 'GET' and path == '/directorio-externo/':
                         if usuario.rol not in ['Lector', 'Administrador', 'SuperRoot']:
                             return jsonify({'error': 'Acceso denegado'})
-
-# Inicializa extensiones
+                    elif method == 'POST' and path  == '/directorio-externo/':
+                        if usuario.rol not in ['Administrador', 'SuperRoot']:
+                            return jsonify({'error': 'Acceso denegado'}), 403
+                    elif method == 'PUT'and path == '/directorio-externo/<int:id>':
+                        if usuario.rol not in ['Administrador', 'SuperRoot']:
+                            return jsonify({'error': 'Acceso denegado'}), 403
+                    elif method == 'DELETE' and path == '/directorio-externo/<int:id>':
+                        if usuario.rol not in ['Administrador', 'SuperRoot']:
+                            return jsonify({'error': 'Acceso denegado'}), 403
+#Inicializa extensiones
 db.init_app(app)
 mail.init_app(app)
 
 # Registrar blueprint
 app.register_blueprint(captura_bp, url_prefix='/captura')
 app.register_blueprint(usuario_bp, url_prefix='/usuario')
+app.register_blueprint(directorio_externo_bp, url_prefix='/directorio-externo')
 app.url_map.strict_slashes = False
 
 with app.app_context():
@@ -109,6 +117,7 @@ def test_email():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)), debug=os.getenv('DEBUG', 'False') == 'True')
-    
+
+   
 # Creado por: Nester Vear 🐻
 # GitHub: github.com/NesterVear
