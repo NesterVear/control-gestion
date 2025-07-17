@@ -25,31 +25,7 @@ def get_capturas():
       'respuesta_pdf_url': c.respuesta_pdf_url,
       'completado': c.completado
    }for c in capturas])
-
-
-@captura_bp.route('/', methods=['GET'])
-@require_role(['Administrador', 'Lector', 'SuperRoot'])
-def get_capturas():
-   capturas = Captura.query.filter_by(eliminado=False).all()
-   return jsonify([{
-        'folio_acaac': c.folio_acaac,
-        'usuario_id': c.usuario_id,
-        'fecha_elaboracion': c.fecha_elaboracion.strftime('%d-%m-%Y'),
-        'fecha_recepcion': c.fecha_recepcion.strftime('%d-%m-%Y'),
-        'numero_oficio': c.numero_oficio,
-        'asunto': c.asunto,
-        'remitente': c.remitente,
-        'destinatario': c.destinatario,
-        'prioridad': c.prioridad,
-        'observacion': c.observacion,
-        'atendio': c.atendio,
-        'pdf_url': c.pdf_url,
-        'eliminado': c.eliminado,
-        'tipo': c.tipo,
-        'status': c.status,
-        'respuesta_pdf_url': c.respuesta_pdf_url,
-        'completado': c.completado
-   } for c in capturas]) 
+ 
 
 @captura_bp.route('/', methods=['POST'], endpoint='crear_captura')
 def crear_captura():
