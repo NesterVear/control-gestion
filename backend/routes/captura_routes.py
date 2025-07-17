@@ -25,7 +25,6 @@ def get_capturas():
       'respuesta_pdf_url': c.respuesta_pdf_url,
       'completado': c.completado
    }for c in capturas])
- 
 
 @captura_bp.route('/', methods=['POST'], endpoint='crear_captura')
 def crear_captura():
@@ -38,7 +37,7 @@ def crear_captura():
     if 'tipo' not in data or data['tipo'] not in ['Entrada', 'Salida']:
        return jsonify({'error': 'Tipo es obligatorio y debe ser Entrada o Salida'}), 400
     nueva_captura = Captura(
-       usuario_id =data['usuario_id'],
+       usuario_id=data['usuario_id'],
        fecha_elaboracion=fecha_elaboracion,
        fecha_recepcion=fecha_recepcion,
        numero_oficio=data['numero_oficio'],
