@@ -35,64 +35,52 @@ app.config['CHIQUI_EMAIL'] = os.getenv('CHIQUI_EMAIL')
 # Middleware para verificar roles
 @app.before_request
 def check_role():
-    role_requirements = {
-        '/captura/': ['GET', 'PUT'], #LECTOR, PUEDE HACER GET Y PUT
-        '/captura/<int:folio_acaac>': ['PUT'],
-        '/captura/<int:folio_acaac>': ['POST'], #Administrador y SuperRoot
-        '/captura/<int:folio_acaac>': ['DELETE'], #Solo SuperRoot
-        '/captura/test-alertas': ['GET'], #Solo SuperRoot
-        '/usuarios/usuarios': ['POST'], # Solo SuperRoot
-        '/usuarios/login': ['POST'], #Todos
-        '/directorio-externo/': ['GET', 'POST'], #Administrador y SuperRoot para POST
-        '/directorio-externo/<int:id>': ['PUT', 'DELETE'], #Administrador (PUT), superRoot (PUT, DELETE)
+    role_requeriments = {
+        '/captura/': ['GET', 'POST'],
+        '/captura/<int:folio_acaac>': ['PUT', 'DELETE'],
+        '/captura/test-alertas': ['GET'],
+        '/directorio-externo/': ['GET', 'POST'],
+        '/directorio-externo/<int:id>': ['PUT','DELETE'],
     }
-    endpoint =request.path
+    endpoint = request.path
     method = request.method
-    for path, methods in role_requirements.items():
+    if endpoint.startswith('/usuarios'):
+        return #deja que usuario_routes.py manejara las restricciones
+    for path, methods in role_requeriments.items():
         if endpoint.startswith(path.split('<')[0]) and method in methods:
             user_id = request.headers.get('User-ID')
             if not user_id:
-                return jsonify({'error': 'Usuario no autenticado'}), 401
+                return jsonify({'error': 'No, no entraste TONOTONO'}), 401
             usuario = db.session.get(Usuario, user_id)
             if not usuario:
-                return jsonify({'eror': 'Usuario no encontrado'}), 401
-            if endpoint == '/user/login':
-                return #Permitir login sin restricciones
-            if method == 'GET'and path == '/captura/':
-                if usuario.rol not in ['Lector', 'Administrador', 'SuperRoot']:
-                    return jsonify({'error': 'Acceso denegado'}), 403
-                elif method == 'PUT' and path == '/captura/<int:folio_acaac>':
-                    if usuario.rol not in ['Lector', 'Administrador', 'SuperRoot']:
-                        return jsonify({'error': 'Acceso denegado'}), 403
-                    elif method == 'POST' and path == '/captura/':
-                        if usuario.rol not in ['Administrador', 'SuperRoot']:
-                            return jsonify({'error': 'Acceso denegado'}), 403
-                    elif method == 'DELETE' and path == '/captura/<int:folio_acaac>':
-                        if usuario.rol != 'SuperRoot':
-                            return jsonify({'error': 'Acceso denegado'}), 403
-                    elif endpoint == '/usuarios/usuarios' and method == 'POST':
-                        if usuario.rol != 'SuperRoot':
-                            return jsonify({'error': 'Acceso denegado'}), 403
-                    elif method == 'GET' and path == '/directorio-externo/':
-                        if usuario.rol not in ['Lector', 'Administrador', 'SuperRoot']:
-                            return jsonify({'error': 'Acceso denegado'})
-                    elif method == 'POST' and path  == '/directorio-externo/':
-                        if usuario.rol not in ['Administrador', 'SuperRoot']:
-                            return jsonify({'error': 'Acceso denegado'}), 403
-                    elif method == 'PUT'and path == '/directorio-externo/<int:id>':
-                        if usuario.rol not in ['Administrador', 'SuperRoot']:
-                            return jsonify({'error': 'Acceso denegado'}), 403
-                    elif method == 'DELETE' and path == '/directorio-externo/<int:id>':
-                        if usuario.rol not in ['Administrador', 'SuperRoot']:
-                            return jsonify({'error': 'Acceso denegado'}), 403
+                return jsonify({'error': 'Usuario no encontrado'})
+            if method == 'GET' and path in ['/captura/', '/directorio-externo/']:
+                if usuario.rol not in ['Lector', 'Capturista', 'Administrador', 'SuperRoot']:
+                    return jsonify({'error': 'Intentalo otra vez, migajero'}), 403
+            elif method == 'POST' and path == '/captura/':
+                if usuario.rol not in ['Capturista', 'Administrador', 'SuperRoot']:
+                    return jsonify({'error': 'Intentalo otra vez, migajero'}), 403
+            elif method == 'POST' and path == '/captura/':
+                if usuario.rol not in ['Capturista', 'Administrador', 'SuperRoot']:
+                    return jsonify({'error': 'Intentalo otra vez, migajero'}), 403
+            elif method == 'PUT' and path == '/captura/<int:folio_acaac>':
+                if usuario.rol not in ['Lector', 'Capturista', 'Administrador', 'SuperRoot']:
+                    return jsonify({'error': 'Intentalo otra vez, migajero'}), 403
+            elif method == 'DELETE' and path == '/directorio-externo/<int:id>':
+                if usuario.rol not in ['Administrador', 'SuperRoot']:
+                    return jsonify({'error': 'Intentalo otra vez, migajero'}), 403
+            elif endpoint == '/captura/test-alertas' and method == 'GET':
+                if usuario.rol != 'SuperRoot':
+                    return jsonify({'error': 'Intentalo otra vez, migajero'}), 403                     
+
 #Inicializa extensiones
 db.init_app(app)
 mail.init_app(app)
 
 # Registrar blueprint
 app.register_blueprint(captura_bp, url_prefix='/captura')
-app.register_blueprint(usuario_bp, url_prefix='/usuario')
-app.register_blueprint(directorio_externo_bp, url_prefix='/directorio-externo')
+app.register_blueprint(usuario_bp, url_prefix='/usuarios')
+app.register_blueprint(directorio_externo_routes_bp, url_prefix='/directorio-externo')
 app.url_map.strict_slashes = False
 
 with app.app_context():
