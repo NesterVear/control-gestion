@@ -46,33 +46,51 @@ def check_role():
     method = request.method
     if endpoint.startswith('/usuarios'):
         return #deja que usuario_routes.py manejara las restricciones
+    user_id = request.headers.get('User-ID')
+    if not user_id:
+        return jsonify({'error': 'No, no entraste TONOTONO'}), 401
+    
+    usuario = db.session.get(Usuario, user_id)
+    if not usuario:
+        return jsonify({'error': 'Usuario no encontrado'},404)
+    
+    # validar acceso basado en endpoint y metodo
     for path, methods in role_requeriments.items():
-        if endpoint.startswith(path.split('<')[0]) and method in methods:
-            user_id = request.headers.get('User-ID')
-            if not user_id:
-                return jsonify({'error': 'No, no entraste TONOTONO'}), 401
-            usuario = db.session.get(Usuario, user_id)
-            if not usuario:
-                return jsonify({'error': 'Usuario no encontrado'})
-            if method == 'GET' and path in ['/captura/', '/directorio-externo/']:
+        path_prefix = path.split('<')[0]
+        if endpoint.startswith (path_prefix) and method in methods:
+            # reglas de combinacion metodo + endpoint
+            if path == '/captura/' and method == 'GET':
                 if usuario.rol not in ['Lector', 'Capturista', 'Administrador', 'SuperRoot']:
-                    return jsonify({'error': 'Intentalo otra vez, migajero'}), 403
-            elif method == 'POST' and path == '/captura/':
+                    return jsonify({'error': 'Acceso Denegado'}), 403
+                
+            elif path == '/captura/' and method == 'POST':
                 if usuario.rol not in ['Capturista', 'Administrador', 'SuperRoot']:
-                    return jsonify({'error': 'Intentalo otra vez, migajero'}), 403
-            elif method == 'POST' and path == '/captura/':
-                if usuario.rol not in ['Capturista', 'Administrador', 'SuperRoot']:
-                    return jsonify({'error': 'Intentalo otra vez, migajero'}), 403
-            elif method == 'PUT' and path == '/captura/<int:folio_acaac>':
-                if usuario.rol not in ['Lector', 'Capturista', 'Administrador', 'SuperRoot']:
-                    return jsonify({'error': 'Intentalo otra vez, migajero'}), 403
-            elif method == 'DELETE' and path == '/directorio-externo/<int:id>':
-                if usuario.rol not in ['Administrador', 'SuperRoot']:
-                    return jsonify({'error': 'Intentalo otra vez, migajero'}), 403
-            elif endpoint == '/captura/test-alertas' and method == 'GET':
-                if usuario.rol != 'SuperRoot':
-                    return jsonify({'error': 'Intentalo otra vez, migajero'}), 403                     
+                    return jsonify({'error': 'Acceso Denegado'}), 403
 
+            elif path == '/captura/<int:folio_acaac>' and method == 'PUT':
+                if usuario.rol not in ['Capturista', 'Administrador', 'SuperRoot']:
+                    return jsonify({'error': 'Acceso Denegado'}), 403
+
+            elif path == '/captura/<int:folio_acaac>' and method == 'DELETE':
+                if usuario.rol not in ['Administrador', 'SuperRoot']:
+                    return jsonify({'error': 'Acceso Denegado'}), 403
+
+            elif path == '/directorio-externo/' and method == 'GET':
+                if usuario.rol not in ['Lector', 'Capturista', 'Administrador', 'SuperRoot']:
+                    return jsonify({'error': 'Acceso Denegado'}), 403
+
+            elif path == '/directorio-externo/' and method == 'POST':
+                if usuario.rol not in ['Administrador', 'SuperRoot']:
+                    return jsonify ({'error': 'Acceso Denegado'}), 403
+
+            elif path == '/directorio-externo/<int:id>' and method in ['PUT', 'DELETE']:
+                if usuario.rol not in ['Administrador', 'SuperRoot']:
+                    return jsonify({'error': 'Acceso Denegado'}), 403
+
+            elif path == '/captura/test-alertas' and method == 'GET':
+                if usuario.rol != 'SuperRoot':
+                    return jsonify({'error': 'Acceso Denegado'}), 403
+                      
 #Inicializa extensiones
 db.init_app(app)
 mail.init_app(app)
@@ -80,7 +98,7 @@ mail.init_app(app)
 # Registrar blueprint
 app.register_blueprint(captura_bp, url_prefix='/captura')
 app.register_blueprint(usuario_bp, url_prefix='/usuarios')
-app.register_blueprint(directorio_externo_routes_bp, url_prefix='/directorio-externo')
+app.register_blueprint(directorio_externo_bp, url_prefix='/directorio-externo')
 app.url_map.strict_slashes = False
 
 with app.app_context():
