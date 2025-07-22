@@ -1,42 +1,72 @@
-'use client'
+'use client';
 
-import { useState, useEffect, use } from "react"
-import { Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User } from "@nextui-org/react"
-import CapturaForm from "@/components/CapturaForm";
+import { useState, useEffect } from 'react';
+import { Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@nextui-org/react';
+import CapturaForm from '@/components/CapturaForm';
+
+interface Captura{
+  folio_acaac: number;
+  fecha_elaboracion: string;
+  numero_oficio: string;
+  tipo: 'Entrada' | 'Salida';
+  atendio: string;
+  completado: boolean;
+}
+
+interface User {
+  id: number;
+  rol: string;
+}
 
 export default function Home() {
-  const [user, setUser] = useState<{ id: number, rol: string } | null>(null)
-  const [capturas, setCapturas] = useState([])
+  const [user, setUser] = useState<User | null>(null);
+  const [capturas, setCapturas] = useState<Captura[]>([]);
 
   const login = async () => {
-    const res = await fetch('http://localhost:5000/usuarios/login', {
+    try{
+      const res = await fetch('http://localhost:5000/usuarios/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ usuario: 'admin', contrasena: 'admin123' }),
-    })
+    });
     const data = await res.json()
-    if (data.id) setUser({ id: data.id, rol: data.rol })
-      alert(data.mensaje || data.error)
+    if (data.id) {
+      setUser({ id: data.id, rol: data.rol });
+    }
+    alert(data.mensaje || data.error);
+  } catch (error) {
+    alert ('Error al inicair sesión');
   }
+};
 
   const fetchCapturas = async () => {
-    if (!user) return
-    const res = await fetch('http://localhost:5000/captura/',{
-      headers: { 'User-ID': user.id.toString() }
-    })
-    const data = await res.json()
-    setCapturas(data)
+    if (!user) return;
+    try{
+      const res = await fetch('http://localhost:5000/captura/', {
+      headers: { 'User-ID': user.id.toString() },
+    });
+    if (res.ok) {
+    const data: Captura[] = await res.json();
+    setCapturas(data);
+  } else {
+    console.error('Error fetching capturas:', await res.json());
   }
+}catch (error) {
+  console.error('Error fetching capturas:', error);
+  }
+};
 
   useEffect(() => {
-    fetchCapturas()
-  }, [user])
+    fetchCapturas();
+  }, [user, fetchCapturas]);
 
   return (
     <main className="min-h-screen p-8 bg-gra-900">
       <h1 className="text-3xl font-bold mb-8">Control de Gestión</h1>
       {!user ? ( 
-        <Button onClick={login} color="primary">Iniciar Sesión</Button>
+        <Button onClick={login} color="primary">
+          Iniciar Sesión
+          </Button>
       ) : (
         <>
         <CapturaForm userId={user.id} rol={user.rol} />
@@ -51,7 +81,7 @@ export default function Home() {
             <TableColumn>Completado</TableColumn>
            </TableHeader>
            <TableBody>
-              {capturas.map((captura: any) => (
+              {capturas.map((captura:any) => (
                 <TableRow key={captura.folio_acaac}>
                   <TableCell>{captura.folio_acaac}</TableCell>
                   <TableCell>{captura.fecha_elaboracion}</TableCell>
@@ -67,5 +97,5 @@ export default function Home() {
         </>
       )}          
     </main>
-  )
+  );
 }

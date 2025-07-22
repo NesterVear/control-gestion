@@ -9,15 +9,22 @@ const config : Config = {
     './node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: { 
+        gray: {
+          900: '#111827', 
+        },
+      },
+    },
   },
   darkMode: 'class',
-  plugins: [nextui({
-    themes: {
+  plugins: [
+    nextui({
+      themes: {
         dark: {
             colors: {
                 background: '#1F2937',
-                foreground: '#FFFFFF',
+                foreground:  '#FFFFFF',
                 primary: {
                     DEFAULT: '#3B82F6',
                     foreground: 'FFFFFF',
@@ -25,6 +32,7 @@ const config : Config = {
             },
         },
     },
-  })],
+  }),
+],
 }
 export default config 
