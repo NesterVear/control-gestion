@@ -35,7 +35,7 @@ export default function Home() {
     }
     alert(data.mensaje || data.error);
   } catch (error) {
-    alert ('Error al inicair sesión');
+    alert ('Error al iniciar sesión');
   }
 };
 
@@ -61,7 +61,7 @@ export default function Home() {
   }, [user, fetchCapturas]);
 
   return (
-    <main className="min-h-screen p-8 bg-gra-900">
+    <main className="min-h-screen p-8 bg-gray-900">
       <h1 className="text-3xl font-bold mb-8">Control de Gestión</h1>
       {!user ? ( 
         <Button onClick={login} color="primary">
