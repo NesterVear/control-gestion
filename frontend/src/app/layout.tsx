@@ -1,5 +1,5 @@
-import type { Metadata } from "next"
-import { Roboto } from 'next/font/google'
+import type { Metadata } from "heroui"
+import { Roboto } from 'heroui/font/google'
 import './globals.css'
 import { Providers } from './providers'
 

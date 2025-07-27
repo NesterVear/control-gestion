@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, Input, Select, SelectItem, useRadio } from "@nextui-org/react"
+import { Button, Input, Select, SelectItem, useRadio } from "@heroui/react"
 import React, { useState } from "react"
 
 export default function CapturaForm({ userId, rol }: { userId: number, rol: string }) {
