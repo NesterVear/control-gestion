@@ -27,7 +27,7 @@ const config : Config = {
             foreground:  '#FFFFFF',
             primary: {
               DEFAULT: '#3B82F6',
-              foreground: 'FFFFFF',
+              foreground: '#FFFFFF',
             },
           },
         },
@@ -35,4 +35,4 @@ const config : Config = {
     }),
   ],
 };
-export default config 
+export default config;

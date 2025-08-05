@@ -1,14 +1,14 @@
-import type { Metadata } from "heroui"
-import { Roboto } from 'heroui/font/google'
-import './globals.css'
-import { Providers } from './providers'
+import type { Metadata } from "next";
+import { Roboto } from 'next/font/google';
+import './globals.css';
+import { Providers } from './providers';
 
 const roboto = Roboto({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: "Control de Gestión",
   description: "Sistema de Gestion de Documentos",
-}
+};
 
 export default function RootLayout({
   children,
@@ -21,5 +21,5 @@ export default function RootLayout({
         <Providers>{children}</Providers>
       </body>
     </html>
-  )
+  );
 }

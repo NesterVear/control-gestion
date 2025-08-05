@@ -70,7 +70,7 @@ export default function Home() {
       ) : (
         <>
         <CapturaForm userId={user.id} rol={user.rol} />
-        <Table arial-label="Capturas" className="mt-8">
+        <Table aria-label="Capturas" className="mt-8">
           <TableHeader>
             <TableColumn>Folio</TableColumn>
             <TableColumn>Fecha Elaboración</TableColumn>

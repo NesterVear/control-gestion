@@ -1,11 +1,11 @@
 'use client'
 
-import { Button, Input, Select, SelectItem, useRadio } from "@heroui/react"
+import { Button, Input, Select, SelectItem } from "@heroui/react"
 import React, { useState } from "react"
 
 export default function CapturaForm({ userId, rol }: { userId: number, rol: string }) {
     const [form, setForm] = useState({
-        usuario_id: useRadio,
+        usuario_id: userId,
         fecha_elaboracion: '',
         fecha_recepcion: '',
         numero_oficio: '', 
@@ -19,19 +19,19 @@ export default function CapturaForm({ userId, rol }: { userId: number, rol: stri
         tipo: '',
         status: '',
         respuesta_pdf_url: '', 
-    })
+    });
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
+        e.preventDefault();
         const res = await fetch('htt://localhost:5000/captura/', {
             method: 'POST',
             headers: {
                 'Content-Type':'application/json',
-                'User-ID': useRadio.toString(), 
+                'User-ID': userId.toString(), 
             },
             body: JSON.stringify(form),
         })
-        const data = await res.json()
+        const data = await res.json();
         alert(data.mensaje || data.error)
     }
     return (
@@ -61,7 +61,7 @@ export default function CapturaForm({ userId, rol }: { userId: number, rol: stri
             <Input
                 label="Asunto"
                 value={form.asunto}
-                onChange={(e) => setForm({ ...form, numero_oficio: e.target.value })}
+                onChange={(e) => setForm({ ...form, asunto: e.target.value })}
                 isDisabled={rol === 'Lector'}
             />
             <Input
