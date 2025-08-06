@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from extensions import db, mail
+from extensions import db, mail, limiter
 from routes.captura_routes import captura_bp
 from routes.usuario_routes import usuario_bp
 from routes.directorio_externo_routes import directorio_externo_bp
@@ -11,6 +11,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+limiter.init_app(app)
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": os.getenv('ALLOWED_ORIGINS', '').split(',')}})
