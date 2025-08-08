@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import CapturaForm from '@/components/CapturaForm';
 
-interface Captura{
+interface Captura {
   folio_acaac: number;
   fecha_elaboracion: string;
+  fecha_recepcion: string;
   numero_oficio: string;
   tipo: 'Entrada' | 'Salida';
   atendio: string;
@@ -23,65 +24,65 @@ export default function Home() {
   const [capturas, setCapturas] = useState<Captura[]>([]);
 
   const login = async () => {
-    try{
+    try {
       const res = await fetch('http://localhost:5000/usuarios/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ usuario: 'admin', contrasena: 'admin123' }),
-    });
-    const data = await res.json()
-    if (data.id) {
-      setUser({ id: data.id, rol: data.rol });
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usuario: 'admin', contrasena: 'admin123' }),
+      });
+      const data = await res.json();
+      if (data.id) {
+        setUser({ id: data.id, rol: data.rol });
+      }
+      alert(data.mensaje || data.error);
+    } catch (error) {
+      alert('Error al iniciar sesión');
     }
-    alert(data.mensaje || data.error);
-  } catch (error) {
-    alert ('Error al iniciar sesión');
-  }
-};
+  };
 
-  const fetchCapturas = async () => {
+  const fetchCapturas = useCallback(async () => {
     if (!user) return;
-    try{
+    try {
       const res = await fetch('http://localhost:5000/captura/', {
-      headers: { 'User-ID': user.id.toString() },
-    });
-    if (res.ok) {
-    const data: Captura[] = await res.json();
-    setCapturas(data);
-  } else {
-    console.error('Error fetching capturas:', await res.json());
-  }
-}catch (error) {
-  console.error('Error fetching capturas:', error);
-  }
-};
+        headers: { 'User-ID': user.id.toString() },
+      });
+      if (res.ok) {
+        const data: Captura[] = await res.json();
+        setCapturas(data);
+      } else {
+        console.error('Error fetching capturas:', await res.json());
+      }
+    } catch (error) {
+      console.error('Error fetching capturas:', error);
+    }
+  }, [user]);
 
   useEffect(() => {
     fetchCapturas();
   }, [user, fetchCapturas]);
 
   return (
-    <main className="min-h-screen p-8 bg-gray-900">
+    <main className="min-h-screen p-8 bg-gray-900 text-white">
       <h1 className="text-3xl font-bold mb-8">Control de Gestión</h1>
-      {!user ? ( 
+      {!user ? (
         <Button onClick={login} color="primary">
           Iniciar Sesión
-          </Button>
+        </Button>
       ) : (
         <>
-        <CapturaForm userId={user.id} rol={user.rol} />
-        <Table aria-label="Capturas" className="mt-8">
-          <TableHeader>
-            <TableColumn>Folio</TableColumn>
-            <TableColumn>Fecha Elaboración</TableColumn>
-            <TableColumn>Fecha Recepción</TableColumn>
-            <TableColumn>Número Oficio</TableColumn>
-            <TableColumn>Tipo</TableColumn>
-            <TableColumn>Atendió</TableColumn>
-            <TableColumn>Completado</TableColumn>
-           </TableHeader>
-           <TableBody>
-              {capturas.map((captura:any) => (
+          <CapturaForm userId={user.id} rol={user.rol} />
+          <Table aria-label="Capturas" className="mt-8">
+            <TableHeader>
+              <TableColumn>Folio</TableColumn>
+              <TableColumn>Fecha Elaboración</TableColumn>
+              <TableColumn>Fecha Recepción</TableColumn>
+              <TableColumn>Número Oficio</TableColumn>
+              <TableColumn>Tipo</TableColumn>
+              <TableColumn>Atendió</TableColumn>
+              <TableColumn>Completado</TableColumn>
+            </TableHeader>
+            <TableBody>
+              {capturas.map((captura) => (
                 <TableRow key={captura.folio_acaac}>
                   <TableCell>{captura.folio_acaac}</TableCell>
                   <TableCell>{captura.fecha_elaboracion}</TableCell>
@@ -89,13 +90,13 @@ export default function Home() {
                   <TableCell>{captura.numero_oficio}</TableCell>
                   <TableCell>{captura.tipo}</TableCell>
                   <TableCell>{captura.atendio}</TableCell>
-                  <TableCell>{captura.completado ? 'Si' : 'No'} </TableCell>
+                  <TableCell>{captura.completado ? 'Sí' : 'No'}</TableCell>
                 </TableRow>
               ))}
-           </TableBody>
+            </TableBody>
           </Table>
         </>
-      )}          
+      )}
     </main>
   );
 }

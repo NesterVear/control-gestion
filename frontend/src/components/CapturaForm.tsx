@@ -23,7 +23,7 @@ export default function CapturaForm({ userId, rol }: { userId: number, rol: stri
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const res = await fetch('htt://localhost:5000/captura/', {
+        const res = await fetch('http://localhost:5000/captura/', { 
             method: 'POST',
             headers: {
                 'Content-Type':'application/json',
@@ -34,6 +34,7 @@ export default function CapturaForm({ userId, rol }: { userId: number, rol: stri
         const data = await res.json();
         alert(data.mensaje || data.error)
     }
+
     return (
         <form onSubmit={handleSubmit} className="space-y-4 max-w-lg mx-auto p-4 bg-gray-800 rounded-lg">
             <Input
@@ -55,7 +56,7 @@ export default function CapturaForm({ userId, rol }: { userId: number, rol: stri
             <Input
                 label="Número de Oficio"
                 value={form.numero_oficio}
-                onChange={(e) => setForm ({ ...form, numero_oficio: e.target.value })}
+                onChange={(e) => setForm({ ...form, numero_oficio: e.target.value })}
                 isDisabled={rol === 'Lector'}
             />
             <Input
@@ -72,14 +73,17 @@ export default function CapturaForm({ userId, rol }: { userId: number, rol: stri
             />
             <Input  
                 label="Destinatario"
-                value={form.prioridad}
+                value={form.destinatario} // Corregido: era form.prioridad
                 onChange={(e) => setForm({ ...form, destinatario: e.target.value })}
                 isDisabled={rol === 'Lector'}
             />
             <Select
                 label="Prioridad"
-                value={form.prioridad}
-                onChange={(e) => setForm({ ...form, prioridad: e.target.value })}
+                selectedKeys={form.prioridad ? [form.prioridad] : []}
+                onSelectionChange={(keys) => {
+                    const value = Array.from(keys)[0] as string;
+                    setForm({ ...form, prioridad: value });
+                }}
                 isDisabled={rol === 'Lector'}
             >
                 <SelectItem key="Extraurgente">Extraurgente</SelectItem>
@@ -94,8 +98,11 @@ export default function CapturaForm({ userId, rol }: { userId: number, rol: stri
             />
             <Select
                 label="Atendió"
-                value={form.atendio}
-                onChange={(e) => setForm({ ...form, atendio: e.target.value })}
+                selectedKeys={form.atendio ? [form.atendio] : []}
+                onSelectionChange={(keys) => {
+                    const value = Array.from(keys)[0] as string;
+                    setForm({ ...form, atendio: value });
+                }}
                 isDisabled={rol === 'Lector'}
             >
                 <SelectItem key="Mitzi">Mitzi</SelectItem>
@@ -111,8 +118,11 @@ export default function CapturaForm({ userId, rol }: { userId: number, rol: stri
             />
             <Select
                 label="Tipo"
-                value={form.tipo}
-                onChange={(e) => setForm({ ...form, tipo: e.target.value})}
+                selectedKeys={form.tipo ? [form.tipo] : []}
+                onSelectionChange={(keys) => {
+                    const value = Array.from(keys)[0] as string;
+                    setForm({ ...form, tipo: value });
+                }}
                 isRequired
                 isDisabled={rol === 'Lector'}
             >
@@ -121,8 +131,11 @@ export default function CapturaForm({ userId, rol }: { userId: number, rol: stri
             </Select>
             <Select
                 label="Status"
-                value={form.status}
-                onChange={(e) => setForm({ ...form, status: e.target.value })}
+                selectedKeys={form.status ? [form.status] : []}
+                onSelectionChange={(keys) => {
+                    const value = Array.from(keys)[0] as string;
+                    setForm({ ...form, status: value });
+                }}
                 isDisabled={rol === 'Lector' || form.tipo !== 'Entrada'}
             >
                 <SelectItem key="Conocimiento">Conocimiento</SelectItem>
