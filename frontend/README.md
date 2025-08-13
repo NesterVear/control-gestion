@@ -1,36 +1,136 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+# Sistema ACAAC - Frontend React
 
-First, run the development server:
+Interfaz React completa para el sistema de capturas ACAAC integrado con el backend Flask.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Características
+
+- ✅ **Autenticación** con modal animado del oso polar 🐻‍❄️
+- ✅ **Transición zoom-in** después del login
+- ✅ **Tema Material-UI oscuro** minimalista
+- ✅ **Estructura por características** escalable
+- ✅ **Control de acceso por roles**: Lector, Capturista, Administrador, SuperRoot
+- ✅ **CRUD completo** para:
+  - Capturas (documentos con PDF)
+  - Directorio Externo
+  - Usuarios (solo SuperRoot)
+- ✅ **Dashboard** con estadísticas
+- ✅ **React Router** con rutas protegidas
+- ✅ **Animaciones Framer Motion**
+
+## Estructura del Proyecto
+
+```
+src/
+├── features/           # Componentes por característica
+│   ├── auth/          # Login modal con oso polar
+│   ├── capturas/      # CRUD capturas
+│   ├── directorioExterno/  # Gestión directorio
+│   └── usuarios/      # Gestión usuarios
+├── components/        # Componentes compartidos
+│   └── Layout/        # AppBar, Sidebar, MainLayout
+├── pages/            # Páginas principales
+├── routes/           # Router y rutas protegidas
+├── services/         # API calls con Axios
+├── contexts/         # Auth context
+├── theme/           # Material-UI tema oscuro
+└── types/           # TypeScript interfaces
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Instalación y Uso
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Instalar dependencias:**
+```bash
+npm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. **Configurar variables de entorno:**
+```bash
+# .env
+VITE_API_BASE_URL=http://localhost:5000
+VITE_APP_NAME=Sistema de Capturas ACAAC
+```
 
-## Learn More
+3. **Iniciar servidor de desarrollo:**
+```bash
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+4. **Construir para producción:**
+```bash
+npm run build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Integración con Backend Flask
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Autenticación
+- Usa header `User-ID` (no JWT tokens)
+- Login: `POST /usuarios/login`
+- Almacena userId, userRole, userName en localStorage
 
-## Deploy on Vercel
+### API Endpoints
+- **Capturas**: `/captura/` (GET, POST), `/captura/<folio>` (PUT, DELETE)
+- **Directorio**: `/directorio-externo/` (GET, POST), `/directorio-externo/<id>` (PUT, DELETE)  
+- **Usuarios**: `/usuarios/login` (POST), `/usuarios/usuarios` (POST)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Roles y Permisos
+- **SuperRoot**: Acceso completo + gestión usuarios
+- **Administrador**: Gestión completa capturas/directorio + alertas
+- **Capturista**: Crear/editar capturas
+- **Lector**: Solo lectura
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Funcionalidades Clave
+
+### 🐻‍❄️ Login con Oso Polar
+- Modal animado con oso polar
+- Validación de credenciales
+- Transición zoom-in al dashboard
+
+### 📄 Gestión de Capturas
+- Lista con búsqueda y filtros
+- Formulario completo con fechas
+- Soporte para PDF (entrada/respuesta)
+- Tipos: Entrada/Salida
+- Status: Conocimiento/Respuesta
+- Sistema de prioridades
+
+### 📇 Directorio Externo  
+- CRUD completo con modals
+- Búsqueda por nombre/cargo/institución
+- Solo Administrador/SuperRoot pueden modificar
+
+### 👥 Gestión de Usuarios
+- Solo SuperRoot puede crear usuarios
+- Roles: Lector, Administrador, SuperRoot
+- Contraseñas encriptadas (bcrypt en backend)
+
+### 🔔 Test de Alertas
+- Endpoint para probar notificaciones
+- Sistema de emails automáticos para capturas pendientes
+
+## Tecnologías
+
+- **React 18** con TypeScript
+- **Vite** como bundler
+- **Material-UI v5** con tema oscuro
+- **React Router v6** para navegación
+- **Framer Motion** para animaciones
+- **Axios** para API calls
+- **Date-fns** para manejo de fechas
+
+## Comandos Disponibles
+
+```bash
+npm run dev        # Servidor desarrollo
+npm run build      # Build producción
+npm run preview    # Preview build
+npm run lint       # ESLint
+```
+
+## Notas del Backend
+
+⚠️ **Inconsistencia detectada**: El modelo `Usuario` en models.py tiene campo `es_super_usuario` (boolean) pero los routes usan `usuario.rol` (string). La app React asume que existe el campo `rol`.
+
+## Creado por 🐻
+
+Sistema desarrollado con amor polar por el equipo ACAAC.
