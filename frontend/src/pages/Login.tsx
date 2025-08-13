@@ -57,7 +57,174 @@ const BearLogin: React.FC<BearLoginProps> = ({ onSuccess }) => {
       }}
     >
       {/* Mantén tus estilos CSS aquí o en un archivo separado */}
-      <style>{`/* (tu CSS del oso tal cual) */`}</style>
+<style>{`
+  .bear-login-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 24px;
+    width: 320px;
+    box-sizing: border-box;
+    color: white;
+    user-select: none;
+    position: relative;
+  }
+
+  .bear-container {
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .polar-bear {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 16px;
+  }
+
+  .bear-ear {
+    position: absolute;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: inset -4px -4px 6px rgba(0,0,0,0.1);
+  }
+
+  .bear-ear.left {
+    left: 0;
+  }
+
+  .bear-ear.right {
+    right: 0;
+  }
+
+  .bear-ear .inner {
+    width: 16px;
+    height: 16px;
+    background: #ccc;
+    border-radius: 50%;
+    margin: 7px auto 0;
+  }
+
+  .bear-head {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    background: white;
+    border-radius: 50%;
+    margin: 0 auto;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    overflow: visible;
+  }
+
+  .bear-eye {
+    position: absolute;
+    top: 35px;
+    width: 18px;
+    height: 18px;
+    background: black;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+  }
+
+  .bear-eye.left {
+    left: 20px;
+  }
+
+  .bear-eye.right {
+    right: 20px;
+  }
+
+  .bear-muzzle {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 40px;
+    background: #eee;
+    border-radius: 40px / 30px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .bear-nose {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 14px;
+    height: 10px;
+    background: black;
+    border-radius: 50% / 40%;
+  }
+
+  .bear-smile {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 10px;
+    border-bottom: 2px solid black;
+    border-radius: 0 0 20px 20px;
+  }
+
+  .bear-paw {
+    position: absolute;
+    bottom: 0;
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease;
+  }
+
+  .bear-paw.left {
+    left: 10px;
+  }
+
+  .bear-paw.right {
+    right: 10px;
+  }
+
+  .paw-pad {
+    position: absolute;
+    background: #ccc;
+    border-radius: 50%;
+  }
+
+  .paw-pad.p1 {
+    width: 12px;
+    height: 12px;
+    top: 10px;
+    left: 8px;
+  }
+
+  .paw-pad.p2 {
+    width: 10px;
+    height: 10px;
+    top: 18px;
+    left: 20px;
+  }
+
+  .paw-pad.p3 {
+    width: 8px;
+    height: 8px;
+    top: 28px;
+    left: 12px;
+  }
+
+  /* Animación para cubrir ojos */
+  .bear-login-card.eyes-covered .bear-paw.left {
+    transform: translate(30px, -40px) rotate(20deg);
+  }
+
+  .bear-login-card.eyes-covered .bear-paw.right {
+    transform: translate(-30px, -40px) rotate(-20deg);
+  }
+`}</style> */
 
       <Paper className={`bear-login-card ${pwdFocus ? 'eyes-covered' : ''}`} elevation={0}>
         <div className="bear-container">

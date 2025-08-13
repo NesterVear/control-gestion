@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 # 1. Carga variables de entorno ANTES de todo
 load_dotenv()
-print("DATABASE_URL:", os.getenv('DATABASE_URL'))
+#print("DATABASE_URL:", os.getenv('DATABASE_URL'))
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -17,9 +17,10 @@ from models import Usuario
 
 # 2. Crea la app
 app = Flask(__name__)
+CORS(app)
 
 # 3. Configura la app
-CORS(app, resources={r"/*": {"origins": os.getenv('ALLOWED_ORIGINS', '').split(',')}})
+#CORS(app, resources={r"/*": {"origins": os.getenv('ALLOWED_ORIGINS', '').split(',')}})
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
