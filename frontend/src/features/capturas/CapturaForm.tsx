@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -26,7 +25,13 @@ import { es } from 'date-fns/locale';
 import { format } from 'date-fns';
 import { capturaService } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
-import type { Captura } from '../../types';
+import type { Prioridad, Atendio, Captura } from '../../types';
+
+type Tipo = 'Entrada' | 'Salida';
+type Status = 'Conocimiento' | 'Respuesta';
+const prioridadades: Prioridad[] = ['Extraurgente', 'Urgente', 'Ordinario'];
+const atendios: Atendio[] = ['Mitzi', 'Edgar', 'Chiqui', 'Rosy'];
+
 
 const initialFormData = {
   usuario_id: 0,
@@ -36,12 +41,12 @@ const initialFormData = {
   asunto: '',
   remitente: '',
   destinatario: '',
-  prioridad: '',
+  prioridad: 'Ordinario' as Prioridad,
   observacion: '',
-  atendio: '',
+  atendio: 'undefined',
   pdf_url: '',
-  tipo: 'Entrada' as const,
-  status: '',
+  tipo: 'Entrada' as Tipo,
+  status: '' as Status,
   respuesta_pdf_url: '',
   completado: false,
 };
@@ -58,6 +63,7 @@ export const CapturaForm: React.FC = () => {
   const navigate = useNavigate();
   const { folio } = useParams();
   const { user } = useAuth();
+  }
 
   useEffect(() => {
     if (folio && folio !== 'nueva') {
@@ -337,7 +343,7 @@ export const CapturaForm: React.FC = () => {
                       <InputLabel>Status</InputLabel>
                       <Select
                         value={formData.status}
-                        onChange={(e) => handleInputChange('status', e.target.value)}
+                        onChange={(e) => handleInputChange('status', e.target.value as Status)}
                         label="Status"
                       >
                         <MenuItem value="Conocimiento">Conocimiento</MenuItem>

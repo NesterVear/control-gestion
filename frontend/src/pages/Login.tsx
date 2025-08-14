@@ -19,7 +19,7 @@ const BearLogin: React.FC<BearLoginProps> = ({ onSuccess }) => {
   const navigate = useNavigate();
 
   // Eye tracking solo en usuario
-  const eyeOffset = Math.min(usuario.length * 1.2, 12);
+  const eyeOffset = Math.min(usuario.length * 2.0, 12);
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -29,7 +29,9 @@ const BearLogin: React.FC<BearLoginProps> = ({ onSuccess }) => {
       const res = await authService.login(usuario, contrasena);
       localStorage.setItem('userId', String(res.id));
       localStorage.setItem('userRole', res.rol);
-      setUser?.({ id: res.id, usuario, rol: res.rol });
+
+      setUser?.({ id: res.id, usuario, rol: res.rol as "Lector" | "Capturista" | "Administrador" | "SuperRoot" });
+
       setMessage('¡Ingreso exitoso!');
       if (onSuccess) {
         onSuccess();
@@ -58,173 +60,307 @@ const BearLogin: React.FC<BearLoginProps> = ({ onSuccess }) => {
     >
       {/* Mantén tus estilos CSS aquí o en un archivo separado */}
 <style>{`
-  .bear-login-card {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 24px;
-    width: 320px;
-    box-sizing: border-box;
-    color: white;
-    user-select: none;
-    position: relative;
-  }
+        :root {
+          --md-surface: #111111;
+          --md-surface-variant: #1a1a1a;
+          --md-primary: #1976d2;
+          --md-on-surface: #ffffff;
+          --md-on-surface-variant: #9e9e9e;
+          --md-outline: #333333;
+          --md-outline-variant: #2a2a2a;
+        }
 
-  .bear-container {
-    text-align: center;
-    margin-bottom: 16px;
-  }
+        /* Bear animations - GPU optimized */
+        @keyframes bear-blink { 
+          0%, 96%, 100% { transform: scaleY(1); } 
+          98% { transform: scaleY(0.1); } 
+        }
+        @keyframes bear-bob { 
+          0%, 100% { transform: translateY(0px); } 
+          50% { transform: translateY(-4px); } 
+        }
+        @keyframes bear-float {
+          0%, 100% { transform: translateY(0px) scale(1); }
+          50% { transform: translateY(-2px) scale(1.01); }
+        }
 
-  .polar-bear {
-    position: relative;
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 16px;
-  }
+        /* Compact card styles */
+        .bear-login-card { 
+          background: var(--md-surface);
+          border: 1px solid var(--md-outline-variant);
+          border-radius: 20px;
+          max-width: 300px;
+          width: 100%;
+          overflow: hidden;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
+          backdrop-filter: blur(20px);
+          position: relative;
+        }
 
-  .bear-ear {
-    position: absolute;
-    top: 0;
-    width: 30px;
-    height: 30px;
-    background: white;
-    border-radius: 50%;
-    box-shadow: inset -4px -4px 6px rgba(0,0,0,0.1);
-  }
+        /* Bear container - more prominent, integrated design */
+        .bear-container { 
+          display: flex; 
+          flex-direction: column; 
+          align-items: center; 
+          padding: 16px 16px 8px;
+          position: relative;
+        }
 
-  .bear-ear.left {
-    left: 0;
-  }
+        .polar-bear { 
+          width: 260px; 
+          height: 260px; 
+          position: relative; 
+          animation: bear-float 8s ease-in-out infinite;
+          filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+        }
 
-  .bear-ear.right {
-    right: 0;
-  }
+        /* IMPROVED EARS - Larger, more integrated, cuter */
+        .bear-ear { 
+          width: 75px; 
+          height: 75px; 
+          background: #ffffff; 
+          border: 5px solid #000000; 
+          border-radius: 50%; 
+          position: absolute; 
+          top: 5px; 
+          z-index: 2;
+          box-shadow: inset 0 -6px 0 rgba(0,0,0,0.08);
+        }
+        .bear-ear.left { left: 35px; transform: rotate(-20deg); }
+        .bear-ear.right { right: 35px; transform: rotate(20deg); }
+        
+        .bear-ear .inner { 
+          width: 36px; 
+          height: 36px; 
+          background: #ff69b4; 
+          border-radius: 50%; 
+          position: absolute; 
+          top: 18px; 
+          left: 50%; 
+          transform: translateX(-50%);
+          border: 2px solid #000;
+        }
 
-  .bear-ear .inner {
-    width: 16px;
-    height: 16px;
-    background: #ccc;
-    border-radius: 50%;
-    margin: 7px auto 0;
-  }
+        /* Bear head - better proportioned */
+        .bear-head { 
+          position: absolute; 
+          left: 50%; 
+          top: 42px; 
+          transform: translateX(-50%); 
+          width: 170px; 
+          height: 155px; 
+          background: #ffffff; 
+          border: 5px solid #000000; 
+          border-radius: 60% 60% 50% 50%; 
+          box-shadow: inset 0 -8px 0 rgba(0,0,0,0.06);
+          z-index: 1;
+        }
 
-  .bear-head {
-    position: relative;
-    width: 100px;
-    height: 100px;
-    background: white;
-    border-radius: 50%;
-    margin: 0 auto;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    overflow: visible;
-  }
+        /* Eyes with smooth tracking */
+        .bear-eye { 
+          width: 30px; 
+          height: 30px; 
+          background: #111111; 
+          border-radius: 50%; 
+          position: absolute; 
+          top: 33px; 
+          z-index: 3; 
+          animation: bear-blink 7s infinite;
+          display: flex; 
+          align-items: center; 
+          justify-content: center;
+          transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        .bear-eye::after { 
+          content: ""; 
+          width: 12px; 
+          height: 12px; 
+          background: #ffffff; 
+          border-radius: 50%; 
+          position: relative;
+          top: -1px;
+        }
+        .bear-eye.left { left: 48px; }
+        .bear-eye.right { right: 48px; }
 
-  .bear-eye {
-    position: absolute;
-    top: 35px;
-    width: 18px;
-    height: 18px;
-    background: black;
-    border-radius: 50%;
-    transition: transform 0.3s ease;
-  }
+        /* Snout area */
+        .bear-muzzle { 
+          position: absolute; 
+          left: 50%; 
+          bottom: 14px; 
+          transform: translateX(-50%); 
+          width: 100px; 
+          height: 72px; 
+          background: #ffffff; 
+          border: 4px solid #000000; 
+          border-radius: 40px;
+          box-shadow: inset 0 -4px 0 rgba(0,0,0,0.06);
+        }
+        .bear-nose { 
+          position: absolute; 
+          left: 50%; 
+          top: 4px; 
+          transform: translateX(-50%); 
+          width: 22px; 
+          height: 18px; 
+          background: #111111; 
+          border-radius: 12px 12px 8px 8px; 
+        }
+        .bear-smile { 
+          position: absolute; 
+          left: 50%; 
+          top: 26px; 
+          transform: translateX(-50%); 
+          width: 42px; 
+          height: 20px; 
+          border-bottom: 4px solid #111111; 
+          border-radius: 0 0 42px 42px; 
+        }
 
-  .bear-eye.left {
-    left: 20px;
-  }
+        /* Paws with smooth animations */
+        .bear-paw { 
+          position: absolute; 
+          width: 80px; 
+          height: 80px; 
+          background: #ffffff; 
+          border: 5px solid #000000; 
+          border-radius: 50%; 
+          z-index: 20; 
+          top: 120px; 
+          transition: all 0.35s cubic-bezier(0.4, 0.0, 0.2, 1);
+          box-shadow: inset 0 -4px rgba(0,0,0,0.08);
+        }
+        .bear-paw.left { left: 0px; }
+        .bear-paw.right { right: 0px; }
+        
+        .paw-pad { 
+          position: absolute; 
+          width: 14px; 
+          height: 14px; 
+          background: #e0e0e0; 
+          border: 2px solid #000000; 
+          border-radius: 50%; 
+        }
+        .paw-pad.p1 { left: 12px; top: 18px; }
+        .paw-pad.p2 { right: 12px; top: 18px; }
+        .paw-pad.p3 { left: 50%; transform: translateX(-50%); top: 8px; }
 
-  .bear-eye.right {
-    right: 20px;
-  }
+        /* Eyes covered animation - only for password field */
+        .bear-login-card.eyes-covered .bear-paw.left { 
+          left: 0px; 
+          top: 40px; 
+          transform: translate(68px, -8px) rotate(-12deg); 
+        }
+        .bear-login-card.eyes-covered .bear-paw.right { 
+          right: 0px; 
+          top: 40px; 
+          transform: translate(-68px, -8px) rotate(12deg); 
+        }
+        .bear-login-card.eyes-covered .bear-eye { 
+          transform: scaleY(0.1); 
+        }
 
-  .bear-muzzle {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 40px;
-    background: #eee;
-    border-radius: 40px / 30px;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-  }
+        /* Compact header */
+        .login-header { 
+          color: var(--md-on-surface); 
+          font-weight: 300; 
+          margin: 8px 0 4px; 
+          font-size: 1.5rem;
+        }
+        .login-subtitle { 
+          color: var(--md-on-surface-variant); 
+          font-size: 13px; 
+          margin-bottom: 16px;
+        }
 
-  .bear-nose {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 14px;
-    height: 10px;
-    background: black;
-    border-radius: 50% / 40%;
-  }
+        /* Form styles - no separation */
+        .login-form {
+          padding: 0 20px 20px;
+        }
 
-  .bear-smile {
-    position: absolute;
-    bottom: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40px;
-    height: 10px;
-    border-bottom: 2px solid black;
-    border-radius: 0 0 20px 20px;
-  }
+        /* Material Design TextField improvements */
+        .bear-textfield {
+          margin-bottom: 16px;
+        }
+        
+        .bear-textfield .MuiOutlinedInput-root {
+          background: var(--md-surface-variant);
+          border-radius: 12px;
+          color: var(--md-on-surface);
+        }
+        
+        .bear-textfield .MuiOutlinedInput-root fieldset {
+          border-color: var(--md-outline);
+        }
+        
+        .bear-textfield .MuiOutlinedInput-root:hover fieldset {
+          border-color: var(--md-outline-variant);
+        }
+        
+        .bear-textfield .MuiOutlinedInput-root.Mui-focused fieldset {
+          border-color: var(--md-primary);
+          border-width: 2px;
+        }
+        
+        .bear-textfield .MuiInputLabel-root {
+          color: var(--md-on-surface-variant);
+        }
+        
+        .bear-textfield .MuiInputLabel-root.Mui-focused {
+          color: var(--md-primary);
+        }
 
-  .bear-paw {
-    position: absolute;
-    bottom: 0;
-    width: 40px;
-    height: 40px;
-    background: white;
-    border-radius: 50%;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    transition: transform 0.3s ease;
-  }
+        /* Enhanced login button */
+        .login-button {
+          background: var(--md-primary) !important;
+          color: var(--md-on-surface) !important;
+          padding: 14px !important;
+          border-radius: 12px !important;
+          text-transform: none !important;
+          font-size: 16px !important;
+          font-weight: 600 !important;
+          box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3) !important;
+          transition: all 0.2s ease !important;
+        }
+        
+        .login-button:hover {
+          background: #1565c0 !important;
+          box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4) !important;
+          transform: translateY(-1px);
+        }
+        
+        .login-button:disabled {
+          background: var(--md-outline) !important;
+          box-shadow: none !important;
+          transform: none !important;
+        }
 
-  .bear-paw.left {
-    left: 10px;
-  }
+        /* Alert improvements */
+        .bear-alert {
+          margin-top: 16px;
+          border-radius: 8px;
+        }
+        
+        .bear-alert.success {
+          background-color: #1b5e20 !important;
+          color: var(--md-on-surface) !important;
+        }
+        
+        .bear-alert.error {
+          background-color: #d32f2f !important;
+          color: var(--md-on-surface) !important;
+        }
 
-  .bear-paw.right {
-    right: 10px;
-  }
-
-  .paw-pad {
-    position: absolute;
-    background: #ccc;
-    border-radius: 50%;
-  }
-
-  .paw-pad.p1 {
-    width: 12px;
-    height: 12px;
-    top: 10px;
-    left: 8px;
-  }
-
-  .paw-pad.p2 {
-    width: 10px;
-    height: 10px;
-    top: 18px;
-    left: 20px;
-  }
-
-  .paw-pad.p3 {
-    width: 8px;
-    height: 8px;
-    top: 28px;
-    left: 12px;
-  }
-
-  /* Animación para cubrir ojos */
-  .bear-login-card.eyes-covered .bear-paw.left {
-    transform: translate(30px, -40px) rotate(20deg);
-  }
-
-  .bear-login-card.eyes-covered .bear-paw.right {
-    transform: translate(-30px, -40px) rotate(-20deg);
-  }
-`}</style> */
+        /* Helpful tip */
+        .bear-tip {
+          color: #808080;
+          font-size: 12px;
+          text-align: center;
+          margin-top: 12px;
+          padding: 8px;
+          opacity: 0.8;
+        }
+      `}</style>
 
       <Paper className={`bear-login-card ${pwdFocus ? 'eyes-covered' : ''}`} elevation={0}>
         <div className="bear-container">
@@ -253,7 +389,6 @@ const BearLogin: React.FC<BearLoginProps> = ({ onSuccess }) => {
           </div>
 
           <Typography variant="h5" className="login-header">Iniciar sesión</Typography>
-          <Typography variant="body2" className="login-subtitle">Una experiencia divertida y elegante</Typography>
         </div>
 
         <Box component="form" onSubmit={onSubmit} className="login-form">
@@ -294,10 +429,6 @@ const BearLogin: React.FC<BearLoginProps> = ({ onSuccess }) => {
               {message}
             </Alert>
           )}
-
-          <Typography variant="caption" className="bear-tip">
-            💡 Consejo: enfoca el campo de contraseña para ver cómo el osito se cubre los ojos
-          </Typography>
         </Box>
       </Paper>
     </div>

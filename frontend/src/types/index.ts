@@ -1,4 +1,5 @@
 
+
 export interface Usuario {
   id: number;
   usuario: string;
@@ -16,9 +17,9 @@ export interface Captura {
   asunto?: string;
   remitente?: string;
   destinatario?: string;
-  prioridad: string;
+  prioridad: Prioridad;
   observacion?: string;
-  atendio?: string;
+  atendio?: Atendio;
   pdf_url?: string;
   eliminado: boolean;
   eliminado_por?: number;
@@ -44,7 +45,7 @@ export interface DirectorioInterno {
 export interface LoginResponse {
   mensaje: string;
   id: number;
-  rol: string;
+  rol: 'Lector' | 'Capturista' | 'Administrador' | 'SuperRoot';
 }
 
 export interface ApiError {
