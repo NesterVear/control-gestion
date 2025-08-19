@@ -60,3 +60,6 @@ export interface AuthContextType {
   loading: boolean;
   setUser?: React.Dispatch<React.SetStateAction<Usuario | null>>;
 }
+
+export type Prioridad = 'Urgente'| 'ExtraUrgente' | 'Ordinario';
+export type Atendio = 'Mitzi' | 'Edgar' | 'Rosy' | 'Chiqui';

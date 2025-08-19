@@ -18,7 +18,6 @@ type Status = 'Conocimiento' | 'Respuesta';
 const prioridades: Prioridad[] = ['Urgente', 'ExtraUrgente', 'Ordinario'];
 const atendios: Atendio[] = ['Mitzi', 'Edgar', 'Chiqui', 'Rosy'];
 
-const atendios: Atendio[] = ['Mitzi', 'Edgar', 'Chiqui', 'Rosy'];
 
 
 const initialFormData = {
@@ -50,7 +49,7 @@ export const CapturaForm: React.FC = () => {
   const navigate = useNavigate();
   const { folio } = useParams();
   const { user } = useAuth();
-  }
+}
 
   useEffect(() => {
     if (folio && folio !== 'nueva') {
