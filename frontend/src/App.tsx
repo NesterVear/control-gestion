@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState  } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LoginModal } from './src/components/LoginModal';
+import { LoginModal } from './features/auth/LoginModal';
 
 const App: React.FC = () => {
   const [loginModalOpen, setLoginModalOpen] = useState(true);
@@ -18,7 +18,7 @@ const App: React.FC = () => {
         onClose={() => setLoginModalOpen(false)}
         onLoginSuccess={handleLoginSuccess}
       />
-      {/* Aquí otras rutas o componentes */}
+      {}
     </>
   );
 };

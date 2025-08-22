@@ -2,7 +2,7 @@
 import React from 'react';
 import { Dialog, DialogContent } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
-import BearLogin from '../pages/Login';
+import BearLogin from '../../pages/Login';
 
 interface LoginModalProps {
   open: boolean;

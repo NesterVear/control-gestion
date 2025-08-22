@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Routes, Route } from 'react-router-dom';
 import { LoginModal } from '../features/auth/LoginModal';
-import Dashboard from '../pages/Dashboard';
-import { ProtectedRoute } from './ProtectedRoute';
+import { Dashboard } from '../pages/Dashboard';
+import  ProtectedRoute  from '../routes/ProtectedRoute';
 
 const AppRouter: React.FC = () => {
   const [loginModalOpen, setLoginModalOpen] = useState(true);
