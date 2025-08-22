@@ -1,99 +1,54 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Routes, Route, Navigate } from 'react-router-dom';
+import { LoginModal } from '../features/auth/LoginModal';
+import Dashboard from '../pages/Dashboard';
+import ProtectedRoute from './ProtectedRoute';
+import { useAuth } from '../contexts/AuthContext';
 
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ProtectedRoute } from './ProtectedRoute';
-import { MainLayout } from '../components/Layout';
-import  Login  from '../pages/Login';
-import { Dashboard } from '../pages/Dashboard';
-import { CapturasList } from '../features/capturas/CapturasList';
-import { CapturaForm } from '../features/capturas/CapturaForm';
-import { DirectorioExternoList } from '../features/directorioExterno/DirectorioExternoList';
-import { UsuariosList } from '../features/usuarios/UsuariosList';
-import { TestAlertas } from '../pages/TestAlertas';
+const AppRouter: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const navigate = useNavigate();
 
-export const AppRouter: React.FC = () => {
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setLoginModalOpen(true);
+    } else {
+      setLoginModalOpen(false);
+    }
+  }, [isAuthenticated]);
+
+  const handleLoginSuccess = () => {
+    setLoginModalOpen(false);
+    navigate('/dashboard');
+  };
+
   return (
-    <BrowserRouter>
+    <>
+      <LoginModal
+        open={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
       <Routes>
-        <Route path="/" element={<Login />} />
-        
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? <Navigate to="/dashboard" replace /> : <></>
+          }
+        />
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute>
-              <MainLayout>
-                <Dashboard />
-              </MainLayout>
+            <ProtectedRoute requiredRoles={["Administrador", "SuperRoot"]}>
+              <Dashboard />
             </ProtectedRoute>
           }
         />
-        
-        <Route
-          path="/capturas"
-          element={
-            <ProtectedRoute requiredRoles={['Lector', 'Capturista', 'Administrador', 'SuperRoot']}>
-              <MainLayout>
-                <CapturasList />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        
-        <Route
-          path="/capturas/nueva"
-          element={
-            <ProtectedRoute requiredRoles={['Capturista', 'Administrador', 'SuperRoot']}>
-              <MainLayout>
-                <CapturaForm />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        
-        <Route
-          path="/capturas/:folio"
-          element={
-            <ProtectedRoute requiredRoles={['Capturista', 'Administrador', 'SuperRoot']}>
-              <MainLayout>
-                <CapturaForm />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        
-        <Route
-          path="/directorio-externo"
-          element={
-            <ProtectedRoute requiredRoles={['Lector', 'Capturista', 'Administrador', 'SuperRoot']}>
-              <MainLayout>
-                <DirectorioExternoList />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        
-        <Route
-          path="/usuarios"
-          element={
-            <ProtectedRoute requiredRoles={['SuperRoot']}>
-              <MainLayout>
-                <UsuariosList />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        
-        <Route
-          path="/test-alertas"
-          element={
-            <ProtectedRoute requiredRoles={['Administrador', 'SuperRoot']}>
-              <MainLayout>
-                <TestAlertas />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
+        {/* Otras rutas */}
       </Routes>
-    </BrowserRouter>
+    </>
   );
 };
+
+export default AppRouter;

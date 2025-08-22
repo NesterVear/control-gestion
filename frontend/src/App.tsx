@@ -1,19 +1,25 @@
-
-import React from 'react';
-import { ThemeProvider } from '@mui/material/styles';
-import { CssBaseline } from '@mui/material';
-import { AuthProvider } from './contexts/AuthContext';
-import { AppRouter } from './routes';
-import theme from './theme';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { LoginModal } from './src/components/LoginModal';
 
 const App: React.FC = () => {
+  const [loginModalOpen, setLoginModalOpen] = useState(true);
+  const navigate = useNavigate();
+
+  const handleLoginSuccess = () => {
+    setLoginModalOpen(false);
+    navigate('/dashboard');
+  };
+
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AuthProvider>
-        <AppRouter />
-      </AuthProvider>
-    </ThemeProvider>
+    <>
+      <LoginModal
+        open={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
+      {/* Aquí otras rutas o componentes */}
+    </>
   );
 };
 

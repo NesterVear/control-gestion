@@ -1,7 +1,8 @@
+// src/components/LoginModal.tsx
 import React from 'react';
 import { Dialog, DialogContent } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
-import BearLogin from '../../pages/Login'; // Ajusta la ruta si es necesario
+import BearLogin from '../pages/Login';
 
 interface LoginModalProps {
   open: boolean;
@@ -10,16 +11,12 @@ interface LoginModalProps {
 }
 
 export const LoginModal: React.FC<LoginModalProps> = ({ open, onClose, onLoginSuccess }) => {
-  const handleClose = () => {
-    onClose();
-  };
-
   return (
     <AnimatePresence>
       {open && (
         <Dialog
           open={open}
-          onClose={handleClose}
+          onClose={onClose}
           maxWidth="sm"
           fullWidth
           PaperProps={{

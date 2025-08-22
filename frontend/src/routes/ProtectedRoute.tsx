@@ -1,42 +1,38 @@
+import React, { useState } from 'react';
+import { useNavigate, Routes, Route } from 'react-router-dom';
+import { LoginModal } from '../features/auth/LoginModal';
+import Dashboard from '../pages/Dashboard';
+import { ProtectedRoute } from './ProtectedRoute';
 
-import React from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { Box, CircularProgress } from '@mui/material';
+const AppRouter: React.FC = () => {
+  const [loginModalOpen, setLoginModalOpen] = useState(true);
+  const navigate = useNavigate();
 
-interface ProtectedRouteProps {
-  children: React.ReactNode;
-  requiredRoles?: string[];
-}
+  const handleLoginSuccess = () => {
+    setLoginModalOpen(false);
+    navigate('/dashboard');
+  };
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
-  requiredRoles = [] 
-}) => {
-  const { isAuthenticated, user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (!isAuthenticated || !user) {
-    return <Navigate to="/" replace />;
-  }
-
-  if (requiredRoles.length > 0 && !requiredRoles.includes(user.rol)) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return <>{children}</>;
+  return (
+    <>
+      <LoginModal
+        open={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
+      <Routes>
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute requiredRoles={['Administrador', 'SuperRoot']}>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        {/* Otras rutas */}
+      </Routes>
+    </>
+  );
 };
+
+export default AppRouter;
